@@ -1,0 +1,7 @@
+{
+  "ts": {
+    "type": "string | undefined",
+    "description": "时间",
+    "format": "date-time"
+  }
+}

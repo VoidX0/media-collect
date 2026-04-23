@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    container_name: postgres
+    environment:
+      TZ: "Asia/Shanghai"
+      POSTGRES_USER: "root" #创建管理员用户
+      POSTGRES_PASSWORD: "media_collect" #创建管理员密码
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./storage/postgres:/var/lib/postgresql #数据
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  media-collect:
+    image: ghcr.io/voidx0/media-collect:latest
+    restart: always
+    container_name: media-collect
+    environment:
+      TZ: "Asia/Shanghai"
+      SystemOptions__Instance: "docker-server"
+      ConnectionOptions__DbConnection: "HOST=postgres; PORT=5432; DATABASE=media_collect; USER ID=root; PASSWORD=media_collect;"
+    ports:
+      - "8080:8080" # api
+      - "3000:3000" # web
+    volumes:
+      - ./Monitor:/media # 挂载媒体目录
+      - ./storage:/app/storage #存储
+    depends_on:
+      postgres:
+        condition: service_healthy
