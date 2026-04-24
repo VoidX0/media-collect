@@ -84,6 +84,7 @@ public static class WebApplicationBuilderExtension
             builder.Services.Configure<ConnectionOptions>(builder.Configuration.GetSection(nameof(ConnectionOptions)));
             builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection(nameof(SmtpOptions)));
             builder.Services.Configure<AiOptions>(builder.Configuration.GetSection(nameof(AiOptions)));
+            builder.Services.Configure<WebDavOptions>(builder.Configuration.GetSection(nameof(WebDavOptions)));
         }
 
         /// <summary>

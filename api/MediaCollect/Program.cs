@@ -33,6 +33,7 @@ builder.ConfigureDb(); // 配置数据库
 builder.Services.AddSingleton<SmtpService>(); // SMTP邮箱服务
 builder.Services.AddSingleton<AiService>(); // AI服务
 builder.Services.AddSingleton<ScheduledJob>(); // 定时任务
+builder.Services.AddSingleton<WebDavService>(); // WebDav服务
 
 // 构建App
 var app = builder.Build();
@@ -74,5 +75,10 @@ namespace MediaCollect
         /// ServiceProvider
         /// </summary>
         public static IServiceProvider? Services { get; private set; }
+
+        /// <summary>
+        /// 本地挂载媒体目录
+        /// </summary>
+        public static string MediaPath => Path.Combine("/media");
     }
 }

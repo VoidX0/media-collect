@@ -53,3 +53,10 @@ BaseUrl = "https://api.deepseek.com" # AI服务地址
 ApiKey = "" # AI服务API密钥
 Model = "deepseek-chat" # AI模型
 TimeoutSeconds = 600 # 超时时间(秒)
+
+# WebDAV配置
+[WebDavOptions]
+Uri = "" # 服务器地址
+Username = "" # 用户名
+Password = "" # 密码
+MediaDirectory = "" # 媒体存储目录
