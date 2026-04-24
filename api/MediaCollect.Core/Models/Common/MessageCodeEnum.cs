@@ -60,6 +60,7 @@ public enum MessageCodeEnum
 
     [Description("WebDav查询失败")] WebDavQueryFailed,
     [Description("该任务已存在")] TaskExists,
+    [Description("该媒体已存在")] MediaExists,
     [Description("该剧集目录不存在")] SeriesNotExists
 
     #endregion

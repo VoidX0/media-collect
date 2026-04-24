@@ -29,6 +29,38 @@ public class CollectMediaController : OrmController<CollectedMedia>
     }
 
     /// <summary>
+    /// 生成下载任务
+    /// </summary>
+    /// <param name="media"></param>
+    /// <param name="savePath"></param>
+    /// <returns></returns>
+    private DownloadTask GenerateTask(CollectedMedia media, string savePath)
+    {
+        var downloadTask = new DownloadTask(media);
+        var task = Task.Run(async () =>
+            await _webDavService.DownloadWithTmp(media.OriginalPath,
+                Path.Combine(savePath, $"{media.Episode}{media.FileType}"), () =>
+                {
+                    downloadTask.Progress = 0;
+                    downloadTask.Status = TaskStatus.Downloading;
+                    downloadTask.Media.StartTime = DateTimeOffset.Now;
+                },
+                progress => { downloadTask.Progress = progress; },
+                () =>
+                {
+                    downloadTask.Status = TaskStatus.Completed;
+                    downloadTask.Media.EndTime = DateTimeOffset.Now;
+                    downloadTask.Media.SavePath = Path.Combine(savePath, $"{media.Episode}{media.FileType}");
+                    Db.Insertable(downloadTask.Media).ExecuteCommand();
+                },
+                _ => { downloadTask.Status = TaskStatus.Failed; }
+            )
+        );
+        downloadTask.CurrentTask = task;
+        return downloadTask;
+    }
+
+    /// <summary>
     /// 添加下载任务
     /// </summary>
     /// <param name="media"></param>
@@ -40,25 +72,14 @@ public class CollectMediaController : OrmController<CollectedMedia>
         // 检查是否已存在下载任务
         if (App.DownloadTasks.Any(x => x.Media.OriginalPath == media.OriginalPath))
             return BadRequest(MessageCodeEnum.TaskExists.ToMessageCode());
+        // 检查是否已存在收录记录
+        if (await Db.Queryable<CollectedMedia>().AnyAsync(x => x.OriginalPath == media.OriginalPath))
+            return BadRequest(MessageCodeEnum.MediaExists.ToMessageCode());
         // 检查目录是否存在
         var savePath = Path.Combine(App.MediaPath, media.Series);
         if (!Directory.Exists(savePath)) return BadRequest(MessageCodeEnum.SeriesNotExists.ToMessageCode());
         // 添加下载任务
-        var downloadTask = new DownloadTask(media);
-        var task = Task.Run(async () =>
-            await _webDavService.DownloadWithTmp(media.OriginalPath,
-                $"{savePath}/{media.Episode}{media.FileType}", () =>
-                {
-                    downloadTask.Progress = 0;
-                    downloadTask.Status = TaskStatus.Downloading;
-                },
-                progress => { downloadTask.Progress = progress; },
-                () => { downloadTask.Status = TaskStatus.Completed; },
-                _ => { downloadTask.Status = TaskStatus.Failed; }
-            )
-        );
-        downloadTask.CurrentTask = task;
-        App.DownloadTasks.Add(downloadTask); // 添加到全局下载任务列表
+        App.DownloadTasks.Add(GenerateTask(media, savePath));
         return Ok();
     }
 
@@ -94,8 +115,8 @@ public class CollectMediaController : OrmController<CollectedMedia>
             // 遍历处理媒体文件
             foreach (var mediaItem in media.Content)
             {
-                if (collected.Any(x => x.OriginalPath == mediaItem.Path)) continue; // 已收录的媒体文件
                 if (App.DownloadTasks.Any(x => x.Media.OriginalPath == mediaItem.Path)) continue; // 已添加下载任务的媒体文件
+                if (collected.Any(x => x.OriginalPath == mediaItem.Path)) continue; // 已收录的媒体文件
                 if (mediaItem.IsCollection) continue; // 只处理文件
                 result.Add(new CollectedMedia
                 {
