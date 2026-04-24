@@ -7,6 +7,36 @@ import { components } from '@/api/schema'
 
 /** Runtime representation of OpenAPI Schemas */
 export const schemas = {
+  AggregateException: {
+    innerExceptions: {
+      type: '{ targetSite?: unknown; message?: string | null | undefined; data?: Record<string, never> | null | undefined; innerException?: any | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; }[] | null | undefined',
+    },
+    message: {
+      type: 'string | null | undefined',
+    },
+    targetSite: {
+      type: 'unknown',
+    },
+    data: {
+      type: 'Record<string, never> | null | undefined',
+    },
+    innerException: {
+      type: '{ targetSite?: unknown; message?: string | null | undefined; data?: Record<string, never> | null | undefined; innerException?: any | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; } | undefined',
+    },
+    helpLink: {
+      type: 'string | null | undefined',
+    },
+    source: {
+      type: 'string | null | undefined',
+    },
+    hResult: {
+      type: 'string | number | undefined',
+      format: 'int32',
+    },
+    stackTrace: {
+      type: 'string | null | undefined',
+    },
+  },
   ChatMessage: {
     role: {
       type: 'string | undefined',
@@ -61,6 +91,51 @@ export const schemas = {
   },
   CustomConditionalType: {},
   CustomOrderByType: {},
+  DownloadTask: {
+    media: {
+      type: '{ id?: string | number | undefined; startTime?: string | undefined; endTime?: string | null | undefined; originalPath?: string | undefined; savePath?: string | undefined; fileSize?: string | number | undefined; fileType?: string | undefined; series?: string | undefined; episode?: string | undefined; }',
+      description: '媒体信息',
+    },
+    currentTask: {
+      type: '{ id?: string | number | undefined; exception?: { innerExceptions?: { targetSite?: unknown; message?: string | null | undefined; data?: Record<string, never> | null | undefined; innerException?: any | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; }[] | null | undefined; message?: string | null | undefined; targetSite?: unknown; data?: Record<string, never> | null | undefined; innerException?: { targetSite?: unknown; message?: string | null | undefined; data?: Record<string, never> | null | undefined; innerException?: any | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; } | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; } | undefined; status?: number | undefined; isCanceled?: boolean | undefined; isCompleted?: boolean | undefined; isCompletedSuccessfully?: boolean | undefined; creationOptions?: number | undefined; asyncState?: unknown; isFaulted?: boolean | undefined; } | null | undefined',
+    },
+    status: {
+      type: 'number | undefined',
+      description: '任务状态',
+    },
+    progress: {
+      type: 'string | number',
+      description: '下载进度',
+      format: 'double',
+    },
+  },
+  Exception: {
+    targetSite: {
+      type: 'unknown',
+    },
+    message: {
+      type: 'string | null | undefined',
+    },
+    data: {
+      type: 'Record<string, never> | null | undefined',
+    },
+    innerException: {
+      type: '{ targetSite?: unknown; message?: string | null | undefined; data?: Record<string, never> | null | undefined; innerException?: any | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; } | undefined',
+    },
+    helpLink: {
+      type: 'string | null | undefined',
+    },
+    source: {
+      type: 'string | null | undefined',
+    },
+    hResult: {
+      type: 'string | number | undefined',
+      format: 'int32',
+    },
+    stackTrace: {
+      type: 'string | null | undefined',
+    },
+  },
   IFormFile: {},
   MessageCode: {
     codeIndex: {
@@ -77,6 +152,7 @@ export const schemas = {
     },
   },
   MessageCodeEnum: {},
+  MethodBase: {},
   PagedResultOfCollectedMedia: {
     items: {
       type: '{ id?: string | number | undefined; startTime?: string | undefined; endTime?: string | null | undefined; originalPath?: string | undefined; savePath?: string | undefined; fileSize?: string | number | undefined; fileType?: string | undefined; series?: string | undefined; episode?: string | undefined; }[]',
@@ -250,6 +326,38 @@ export const schemas = {
       description: '角色',
     },
   },
+  Task: {
+    id: {
+      type: 'string | number | undefined',
+      format: 'int32',
+    },
+    exception: {
+      type: '{ innerExceptions?: { targetSite?: unknown; message?: string | null | undefined; data?: Record<string, never> | null | undefined; innerException?: any | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; }[] | null | undefined; message?: string | null | undefined; targetSite?: unknown; data?: Record<string, never> | null | undefined; innerException?: { targetSite?: unknown; message?: string | null | undefined; data?: Record<string, never> | null | undefined; innerException?: any | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; } | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; } | undefined',
+    },
+    status: {
+      type: 'number | undefined',
+    },
+    isCanceled: {
+      type: 'boolean | undefined',
+    },
+    isCompleted: {
+      type: 'boolean | undefined',
+    },
+    isCompletedSuccessfully: {
+      type: 'boolean | undefined',
+    },
+    creationOptions: {
+      type: 'number | undefined',
+    },
+    asyncState: {
+      type: 'unknown',
+    },
+    isFaulted: {
+      type: 'boolean | undefined',
+    },
+  },
+  TaskCreationOptions: {},
+  TaskStatus: {},
   UserVerifyType: {},
   demo: {
     ts: {
@@ -260,14 +368,18 @@ export const schemas = {
   },
 }
 
+export type AggregateException = components['schemas']['AggregateException']
 export type ChatMessage = components['schemas']['ChatMessage']
 export type CollectedMedia = components['schemas']['CollectedMedia']
 export type CustomConditionalType =
   components['schemas']['CustomConditionalType']
 export type CustomOrderByType = components['schemas']['CustomOrderByType']
+export type DownloadTask = components['schemas']['DownloadTask']
+export type Exception = components['schemas']['Exception']
 export type IFormFile = components['schemas']['IFormFile']
 export type MessageCode = components['schemas']['MessageCode']
 export type MessageCodeEnum = components['schemas']['MessageCodeEnum']
+export type MethodBase = components['schemas']['MethodBase']
 export type PagedResultOfCollectedMedia =
   components['schemas']['PagedResultOfCollectedMedia']
 export type QueryCondition = components['schemas']['QueryCondition']
@@ -279,5 +391,8 @@ export type SchemaInfo = components['schemas']['SchemaInfo']
 export type SystemController = components['schemas']['SystemController']
 export type SystemRole = components['schemas']['SystemRole']
 export type SystemUser = components['schemas']['SystemUser']
+export type Task = components['schemas']['Task']
+export type TaskCreationOptions = components['schemas']['TaskCreationOptions']
+export type TaskStatus = components['schemas']['TaskStatus']
 export type UserVerifyType = components['schemas']['UserVerifyType']
 export type demo = generated['schemas']['demo']

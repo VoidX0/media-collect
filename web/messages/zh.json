@@ -74,6 +74,7 @@
     "app": "Media Collect",
     "appMark": "Media Collect",
     "navDashboard": "概览",
+    "navCollectMedia": "媒体转存",
     "navAuthentication": "权限管理",
     "account": "账户",
     "notifications": "通知",
@@ -196,6 +197,10 @@
     "ControllerNotFound": "控制器不存在",
     "TokenInvalidOrExpired": "token无效或已过期",
     "InvalidId": "无效的ID",
-    "AvatarNotFound": "用户未设置头像"
+    "AvatarNotFound": "用户未设置头像",
+    "WebDavQueryFailed": "WebDav查询失败",
+    "TaskExists": "该任务已存在: {0}",
+    "MediaExists": "该媒体已存在: {0}",
+    "SeriesNotExists": "该剧集目录不存在: {0}"
   }
 }

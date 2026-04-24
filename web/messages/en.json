@@ -74,6 +74,7 @@
     "app": "Media Collect",
     "appMark": "Media Collect",
     "navDashboard": "Dashboard",
+    "navCollectMedia": "Media Collect",
     "navAuthentication": "Permission Manage",
     "account": "Account",
     "notifications": "Notifications",
@@ -196,6 +197,10 @@
     "ControllerNotFound": "Controller not found",
     "TokenInvalidOrExpired": "Token is invalid or has expired",
     "InvalidId": "Invalid ID",
-    "AvatarNotFound": "User has not set an avatar"
+    "AvatarNotFound": "User has not set an avatar",
+    "WebDavQueryFailed": "WebDav query failed",
+    "TaskExists": "This task already exists: {0}",
+    "MediaExists": "This media already exists: {0}",
+    "SeriesNotExists": "This series directory does not exist: {0}"
   }
 }

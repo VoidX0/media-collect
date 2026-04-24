@@ -1369,7 +1369,156 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/CollectedMedia/Insert": {
+    "/CollectMedia/AddDownloadTask": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加下载任务 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CollectedMedia"][];
+                    "text/json": components["schemas"]["CollectedMedia"][];
+                    "application/*+json": components["schemas"]["CollectedMedia"][];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MessageCode"];
+                        "application/json": components["schemas"]["MessageCode"];
+                        "text/json": components["schemas"]["MessageCode"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/CollectMedia/DownloadTasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 获取下载任务列表 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["DownloadTask"][];
+                        "application/json": components["schemas"]["DownloadTask"][];
+                        "text/json": components["schemas"]["DownloadTask"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MessageCode"];
+                        "application/json": components["schemas"]["MessageCode"];
+                        "text/json": components["schemas"]["MessageCode"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/CollectMedia/PendingMedia": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 获取待处理的媒体文件列表 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["CollectedMedia"][];
+                        "application/json": components["schemas"]["CollectedMedia"][];
+                        "text/json": components["schemas"]["CollectedMedia"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MessageCode"];
+                        "application/json": components["schemas"]["MessageCode"];
+                        "text/json": components["schemas"]["MessageCode"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/CollectMedia/Insert": {
         parameters: {
             query?: never;
             header?: never;
@@ -1427,7 +1576,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/CollectedMedia/Delete": {
+    "/CollectMedia/Delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -1485,7 +1634,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/CollectedMedia/Update": {
+    "/CollectMedia/Update": {
         parameters: {
             query?: never;
             header?: never;
@@ -1543,7 +1692,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/CollectedMedia/Query": {
+    "/CollectMedia/Query": {
         parameters: {
             query?: never;
             header?: never;
@@ -1602,7 +1751,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/CollectedMedia/Count": {
+    "/CollectMedia/Count": {
         parameters: {
             query?: never;
             header?: never;
@@ -1661,7 +1810,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/CollectedMedia/DownloadExcel": {
+    "/CollectMedia/DownloadExcel": {
         parameters: {
             query?: never;
             header?: never;
@@ -1720,6 +1869,18 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AggregateException: {
+            innerExceptions?: null | components["schemas"]["Exception"][];
+            message?: null | string;
+            targetSite?: components["schemas"]["MethodBase"];
+            data?: null | Record<string, never>;
+            innerException?: components["schemas"]["Exception"];
+            helpLink?: null | string;
+            source?: null | string;
+            /** Format: int32 */
+            hResult?: number | string;
+            stackTrace?: null | string;
+        };
         /** @description 聊天消息模型 */
         ChatMessage: {
             /** @description 角色 (user, assistant, system) */
@@ -1793,6 +1954,31 @@ export interface components {
          *     | 1 | Desc |
          */
         CustomOrderByType: number;
+        /** @description 下载任务 */
+        DownloadTask: {
+            /** @description 媒体信息 */
+            media: components["schemas"]["CollectedMedia"];
+            currentTask?: null | components["schemas"]["Task"];
+            /** @description 任务状态 */
+            status?: components["schemas"]["TaskStatus"];
+            /**
+             * Format: double
+             * @description 下载进度
+             * @default 0
+             */
+            progress: number | string;
+        };
+        Exception: {
+            targetSite?: components["schemas"]["MethodBase"];
+            message?: null | string;
+            data?: null | Record<string, never>;
+            innerException?: components["schemas"]["Exception"];
+            helpLink?: null | string;
+            source?: null | string;
+            /** Format: int32 */
+            hResult?: number | string;
+            stackTrace?: null | string;
+        };
         /** Format: binary */
         IFormFile: string;
         MessageCode: {
@@ -1830,8 +2016,13 @@ export interface components {
          *     | TokenInvalidOrExpired | token无效或已过期 |
          *     | InvalidId | 无效的ID |
          *     | AvatarNotFound | 用户未设置头像 |
+         *     | WebDavQueryFailed | WebDav查询失败 |
+         *     | TaskExists | 该任务已存在: {0} |
+         *     | MediaExists | 该媒体已存在: {0} |
+         *     | SeriesNotExists | 该剧集目录不存在: {0} |
          */
         MessageCodeEnum: string;
+        MethodBase: unknown;
         /** @description 通用分页响应结果 */
         PagedResultOfCollectedMedia: {
             /** @description 当前页的数据列表 */
@@ -1959,6 +2150,43 @@ export interface components {
             /** @description 角色 */
             role?: (number | string)[];
         };
+        Task: {
+            /** Format: int32 */
+            id?: number | string;
+            exception?: components["schemas"]["AggregateException"];
+            status?: components["schemas"]["TaskStatus"];
+            isCanceled?: boolean;
+            isCompleted?: boolean;
+            isCompletedSuccessfully?: boolean;
+            creationOptions?: components["schemas"]["TaskCreationOptions"];
+            asyncState?: unknown;
+            isFaulted?: boolean;
+        };
+        /**
+         * @description | 枚举值 | 描述 |
+         *     |------|------|
+         *     | 0 | None |
+         *     | 1 | PreferFairness |
+         *     | 2 | LongRunning |
+         *     | 4 | AttachedToParent |
+         *     | 8 | DenyChildAttach |
+         *     | 16 | HideScheduler |
+         *     | 64 | RunContinuationsAsynchronously |
+         */
+        TaskCreationOptions: number;
+        /**
+         * @description | 枚举值 | 描述 |
+         *     |------|------|
+         *     | 0 | Created |
+         *     | 1 | WaitingForActivation |
+         *     | 2 | WaitingToRun |
+         *     | 3 | Running |
+         *     | 4 | WaitingForChildrenToComplete |
+         *     | 5 | RanToCompletion |
+         *     | 6 | Canceled |
+         *     | 7 | Faulted |
+         */
+        TaskStatus: number;
         /**
          * @description | 枚举值 | 描述 |
          *     |------|------|

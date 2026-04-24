@@ -1,6 +1,6 @@
 'use client'
 
-import { LayoutDashboard, type LucideIcon, Shield } from 'lucide-react'
+import { Film, LayoutDashboard, type LucideIcon, Shield } from 'lucide-react'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 
@@ -99,6 +99,15 @@ export function AppSidebar({
           title: t('navDashboard'),
           url: `/${locale}/dashboard`,
           icon: LayoutDashboard,
+        },
+        {
+          title: t('navCollectMedia'),
+          url: `/${locale}/collect-media`,
+          icon: Film,
+          hidden:
+            data?.find(
+              (item) => item.controller === 'CollectMediaController',
+            ) === undefined,
         },
         {
           title: t('navAuthentication'),
