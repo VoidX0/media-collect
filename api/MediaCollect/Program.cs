@@ -1,6 +1,8 @@
+using System.Collections.Concurrent;
 using MediaCollect;
 using MediaCollect.Core.Models.Common;
 using MediaCollect.Core.Utils.Extension;
+using MediaCollect.Models;
 using MediaCollect.Services;
 using MediaCollect.Utils.Extension;
 using MediaCollect.Utils.Middleware;
@@ -80,5 +82,10 @@ namespace MediaCollect
         /// 本地挂载媒体目录
         /// </summary>
         public static string MediaPath => Path.Combine("/media");
+
+        /// <summary>
+        /// 全局下载任务列表
+        /// </summary>
+        public static ConcurrentBag<DownloadTask> DownloadTasks { get; } = [];
     }
 }

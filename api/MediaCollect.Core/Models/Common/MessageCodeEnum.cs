@@ -55,4 +55,12 @@ public enum MessageCodeEnum
     [Description("用户未设置头像")] AvatarNotFound,
 
     #endregion
+
+    #region CollectMediaController
+
+    [Description("WebDav查询失败")] WebDavQueryFailed,
+    [Description("该任务已存在")] TaskExists,
+    [Description("该剧集目录不存在")] SeriesNotExists
+
+    #endregion
 }
