@@ -63,23 +63,31 @@ public class CollectMediaController : OrmController<CollectedMedia>
     /// <summary>
     /// 添加下载任务
     /// </summary>
-    /// <param name="media"></param>
+    /// <param name="medias"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ActionResult> AddDownloadTask(CollectedMedia media)
+    public async Task<ActionResult> AddDownloadTask(List<CollectedMedia> medias)
     {
         await Task.CompletedTask;
-        // 检查是否已存在下载任务
-        if (App.DownloadTasks.Any(x => x.Media.OriginalPath == media.OriginalPath))
-            return BadRequest(MessageCodeEnum.TaskExists.ToMessageCode());
-        // 检查是否已存在收录记录
-        if (await Db.Queryable<CollectedMedia>().AnyAsync(x => x.OriginalPath == media.OriginalPath))
-            return BadRequest(MessageCodeEnum.MediaExists.ToMessageCode());
-        // 检查目录是否存在
-        var savePath = Path.Combine(App.MediaPath, media.Series);
-        if (!Directory.Exists(savePath)) return BadRequest(MessageCodeEnum.SeriesNotExists.ToMessageCode());
-        // 添加下载任务
-        App.DownloadTasks.Add(GenerateTask(media, savePath));
+        foreach (var media in medias)
+        {
+            // 检查是否已存在下载任务
+            if (App.DownloadTasks.Any(x => x.Media.OriginalPath == media.OriginalPath))
+                return BadRequest(MessageCodeEnum.TaskExists.ToMessageCode(media.OriginalPath));
+            // 检查是否已存在收录记录
+            if (await Db.Queryable<CollectedMedia>().AnyAsync(x => x.OriginalPath == media.OriginalPath))
+                return BadRequest(MessageCodeEnum.MediaExists.ToMessageCode(media.OriginalPath));
+            // 检查目录是否存在
+            if (!Directory.Exists(Path.Combine(App.MediaPath, media.Series)))
+                return BadRequest(MessageCodeEnum.SeriesNotExists.ToMessageCode(media.OriginalPath));
+        }
+
+        foreach (var media in medias)
+        {
+            // 添加下载任务
+            App.DownloadTasks.Add(GenerateTask(media, Path.Combine(App.MediaPath, media.Series)));
+        }
+
         return Ok();
     }
 
