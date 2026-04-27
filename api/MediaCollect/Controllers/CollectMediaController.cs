@@ -154,7 +154,9 @@ public class CollectMediaController : OrmController<CollectedMedia>
     public async Task<ActionResult<List<DownloadTask>>> DownloadTasks()
     {
         await Task.CompletedTask;
-        var result = App.DownloadTasks.OrderBy(x => x.Series).ThenByDescending(x => x.Progress);
+        var result = App.DownloadTasks
+            .OrderBy(x => x.Series).ThenByDescending(x => x.Progress)
+            .ToList();
         return Ok(result);
     }
 
