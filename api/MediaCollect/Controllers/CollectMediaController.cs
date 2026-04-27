@@ -57,6 +57,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
                     // Sonarr相关操作
                     if (series is not null)
                     {
+                        downloadTask.Status = TaskStatus.Processing;
                         Thread.Sleep(10 * 1000); // 等待文件系统稳定
                         _sonarrService.RefreshSeries(series.Id).Wait(); // 刷新剧集
                         Thread.Sleep(60 * 1000); // 等待刷新完成

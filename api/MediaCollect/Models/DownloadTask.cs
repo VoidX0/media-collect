@@ -57,6 +57,7 @@ public enum TaskStatus
 {
     [Description("待处理")] Pending = 1,
     [Description("下载中")] Downloading = 2,
-    [Description("已完成")] Completed = 3,
-    [Description("下载失败")] Failed = 4,
+    [Description("Sonarr处理中")] Processing = 3,
+    [Description("已完成")] Completed = 4,
+    [Description("下载失败")] Failed = 5,
 }
