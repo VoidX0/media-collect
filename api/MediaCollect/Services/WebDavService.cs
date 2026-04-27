@@ -140,7 +140,7 @@ public class WebDavService
         Action<double>? onProgress = null, Action? onComplete = null, Action<Exception>? onError = null)
     {
         var tmpFilePath = localFilePath + ".tmp";
-        var result = await Download(remoteFilePath, tmpFilePath, onStart, onProgress, onComplete, onError);
+        var result = await Download(remoteFilePath, tmpFilePath, onStart, onProgress, null, onError);
         if (result.IsSuccess)
         {
             try
@@ -148,9 +148,11 @@ public class WebDavService
                 if (File.Exists(localFilePath))
                     File.Delete(localFilePath);
                 File.Move(tmpFilePath, localFilePath);
+                onComplete?.Invoke(); // 只有在成功重命名后才调用完成回调
             }
             catch (Exception ex)
             {
+                onError?.Invoke(ex); // 重命名失败时调用错误回调
                 return OperateResult.Fail($"下载完成但无法重命名临时文件: {ex.Message}");
             }
         }

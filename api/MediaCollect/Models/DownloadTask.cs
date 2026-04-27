@@ -14,6 +14,11 @@ public class DownloadTask
     public CollectedMedia Media { get; set; }
 
     /// <summary>
+    /// Sonarr系列
+    /// </summary>
+    public SonarrSeries? Series { get; set; }
+
+    /// <summary>
     /// 当前任务
     /// </summary>
     public Task? CurrentTask { get; set; }
@@ -32,12 +37,14 @@ public class DownloadTask
     /// 构造函数
     /// </summary>
     /// <param name="media"></param>
+    /// <param name="series"></param>
     /// <param name="status"></param>
     /// <param name="progress"></param>
-    public DownloadTask(CollectedMedia media, TaskStatus status = TaskStatus.Pending,
-        double progress = 0)
+    public DownloadTask(CollectedMedia media, SonarrSeries? series = null,
+        TaskStatus status = TaskStatus.Pending, double progress = 0)
     {
         Media = media;
+        Series = series;
         Status = status;
         Progress = progress;
     }

@@ -34,12 +34,15 @@ public class CollectMediaController : OrmController<CollectedMedia>
     /// <summary>
     /// 生成下载任务
     /// </summary>
+    /// <param name="sonarrSeries"></param>
     /// <param name="media"></param>
     /// <param name="savePath"></param>
     /// <returns></returns>
-    private DownloadTask GenerateTask(CollectedMedia media, string savePath)
+    private DownloadTask GenerateTask(List<SonarrSeries> sonarrSeries, CollectedMedia media, string savePath)
     {
-        var downloadTask = new DownloadTask(media);
+        var series = sonarrSeries.FirstOrDefault(x =>
+            x.Path.Contains(media.Series, StringComparison.CurrentCultureIgnoreCase));
+        var downloadTask = new DownloadTask(media, series);
         var task = Task.Run(async () =>
             await _webDavService.DownloadWithTmp(media.OriginalPath,
                 Path.Combine(savePath, $"{media.Episode}{media.FileType}"), () =>
@@ -51,6 +54,22 @@ public class CollectMediaController : OrmController<CollectedMedia>
                 progress => { downloadTask.Progress = progress; },
                 () =>
                 {
+                    // Sonarr相关操作
+                    if (series is not null)
+                    {
+                        Thread.Sleep(10 * 1000); // 等待文件系统稳定
+                        _sonarrService.RefreshSeries(series.Id).Wait(); // 刷新剧集
+                        Thread.Sleep(60 * 1000); // 等待刷新完成
+                        var fileId = _sonarrService.GetRenameEpisode(series.Id).Result; // 获取需要重命名的剧集ID
+                        if (fileId is { IsSuccess: true, Content.Count: > 0 })
+                        {
+                            // 重命名剧集文件
+                            _sonarrService.RenameEpisodeFiles(series.Id,
+                                fileId.Content.Select(x => x.EpisodeFileId).ToList()).Wait();
+                        }
+                    }
+
+                    // 保存记录
                     downloadTask.Status = TaskStatus.Completed;
                     downloadTask.Media.EndTime = DateTimeOffset.Now;
                     downloadTask.Media.SavePath = Path.Combine(savePath, $"{media.Episode}{media.FileType}");
@@ -71,7 +90,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
     [HttpPost]
     public async Task<ActionResult> AddDownloadTask(List<CollectedMedia> medias)
     {
-        await Task.CompletedTask;
+        var sonarrSeries = await _sonarrService.GetSeries();
         foreach (var media in medias)
         {
             // 检查是否已存在下载任务
@@ -88,7 +107,8 @@ public class CollectMediaController : OrmController<CollectedMedia>
         foreach (var media in medias)
         {
             // 添加下载任务
-            App.DownloadTasks.Add(GenerateTask(media, Path.Combine(App.MediaPath, media.Series)));
+            App.DownloadTasks.Add(
+                GenerateTask(sonarrSeries.Content ?? [], media, Path.Combine(App.MediaPath, media.Series)));
         }
 
         return Ok();
