@@ -122,7 +122,8 @@ public class CollectMediaController : OrmController<CollectedMedia>
     public async Task<ActionResult<List<DownloadTask>>> DownloadTasks()
     {
         await Task.CompletedTask;
-        return Ok(App.DownloadTasks);
+        var result = App.DownloadTasks.ToList();
+        return Ok(result);
     }
 
     /// <summary>
