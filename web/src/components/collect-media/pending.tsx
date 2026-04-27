@@ -1,40 +1,11 @@
-import {
-  CollectedMedia,
-  PendingSeries,
-  SonarrEpisode,
-} from '@/api/generatedSchemas'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
+import { CollectedMedia, PendingSeries, SonarrEpisode } from '@/api/generatedSchemas'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { openapi } from '@/lib/http'
-import {
-  CircleCheck,
-  Download,
-  FileVideo,
-  HardDrive,
-  Loader,
-  Search,
-} from 'lucide-react'
+import { CircleCheck, Download, FileVideo, HardDrive, Loader, Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -230,25 +201,30 @@ export default function Pending() {
               >
                 {/*折叠区域标题*/}
                 <AccordionTrigger className="hover:bg-accent/50 px-4 py-3 transition-all hover:no-underline">
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center">
                     <span className="text-base font-bold">
                       {series.series.title}
                     </span>
-                    <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px]">
-                      {series.medias.length} items
-                    </span>
-                    {/* 标记为完成按钮 */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleMarkComplete(series.medias ?? []).then()
-                      }}
-                    >
-                      <CircleCheck className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px]">
+                        {series.medias[0]!.series}
+                      </span>
+                      <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px]">
+                        {series.medias.length} items
+                      </span>
+                      {/* 标记为完成按钮 */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleMarkComplete(series.medias ?? []).then()
+                        }}
+                      >
+                        <CircleCheck className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </AccordionTrigger>
                 {/*折叠区域内容*/}
