@@ -18,7 +18,7 @@ public class PendingSeries
     public SonarrSeries Series { get; set; } = new();
 
     /// <summary>
-    /// Sonarr缺失的集信息SxxExx
+    /// Sonarr缺失的集信息
     /// </summary>
-    public List<string> MissingEpisodes { get; set; } = [];
+    public List<SonarrEpisode> MissingEpisodes { get; set; } = [];
 }

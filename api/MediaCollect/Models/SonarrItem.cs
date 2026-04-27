@@ -37,6 +37,11 @@ public class SonarrEpisode
     public int EpisodeNumber { get; set; }
 
     /// <summary>
+    /// 标题
+    /// </summary>
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>
     /// 是否有文件
     /// </summary>
     public bool HasFile { get; set; }

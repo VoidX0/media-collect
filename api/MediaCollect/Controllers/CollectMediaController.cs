@@ -167,7 +167,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
             {
                 Series = sonarr ?? new SonarrSeries { Title = seriesItem.Name, Path = seriesItem.Path },
                 Medias = medias,
-                MissingEpisodes = missingEpisodes.Select(x => $"S{x.SeasonNumber:D2}E{x.EpisodeNumber:D2}").ToList()
+                MissingEpisodes = missingEpisodes
             };
         }).ToArray();
         await Task.WhenAll(tasks);
