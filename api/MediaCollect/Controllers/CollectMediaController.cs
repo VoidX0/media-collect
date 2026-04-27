@@ -18,14 +18,17 @@ namespace MediaCollect.Controllers;
 public class CollectMediaController : OrmController<CollectedMedia>
 {
     private readonly WebDavService _webDavService;
+    private readonly SonarrService _sonarrService;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="webDavService"></param>
-    public CollectMediaController(WebDavService webDavService)
+    /// <param name="sonarrService"></param>
+    public CollectMediaController(WebDavService webDavService, SonarrService sonarrService)
     {
         _webDavService = webDavService;
+        _sonarrService = sonarrService;
     }
 
     /// <summary>
@@ -107,18 +110,27 @@ public class CollectMediaController : OrmController<CollectedMedia>
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    public async Task<ActionResult<List<CollectedMedia>>> PendingMedia()
+    public async Task<ActionResult<List<PendingSeries>>> PendingMedia()
     {
         var collected = await Db.Queryable<CollectedMedia>().ToListAsync();
-        var series = await _webDavService.List();
-        if (!series.IsSuccess || series.Content is null)
+        var davSeries = await _webDavService.List();
+        var sonarrSeries = await _sonarrService.GetSeries();
+        if (!davSeries.IsSuccess || davSeries.Content is null)
             return BadRequest(MessageCodeEnum.WebDavQueryFailed.ToMessageCode());
         // 并行查询每个剧集下的媒体文件
-        var tasks = series.Content.Where(x => x.IsCollection).Select(async seriesItem =>
+        var tasks = davSeries.Content.Where(x => x.IsCollection).Select(async seriesItem =>
         {
             var media = await _webDavService.List(seriesItem.Path);
-            if (!media.IsSuccess || media.Content is null) return [];
-            return media.Content.Where(mediaItem =>
+            if (!media.IsSuccess || media.Content is null) return null; // 没有需要处理的媒体文件
+            // 找到对应的信息
+            var sonarr = sonarrSeries.Content?.FirstOrDefault(x =>
+                x.Path.Contains(seriesItem.Name, StringComparison.CurrentCultureIgnoreCase));
+            var missing = await _sonarrService.GetEpisodes(sonarr?.Id ?? 0);
+            var missingEpisodes = missing is { IsSuccess: true, Content: not null }
+                ? missing.Content.Where(x => !x.HasFile).ToList()
+                : [];
+            // 转换格式
+            var medias = media.Content.Where(mediaItem =>
                     App.DownloadTasks.All(x => x.Media.OriginalPath != mediaItem.Path) && // 已添加下载任务的媒体文件
                     collected.All(x => x.OriginalPath != mediaItem.Path) && // 已收录的媒体文件
                     !mediaItem.IsCollection) // 只处理文件
@@ -130,9 +142,18 @@ public class CollectMediaController : OrmController<CollectedMedia>
                     Series = seriesItem.Name,
                     Episode = Path.GetFileNameWithoutExtension(mediaItem.Name)
                 }).ToList();
+            // 返回封装后的信息
+            return new PendingSeries
+            {
+                Series = sonarr ?? new SonarrSeries { Title = seriesItem.Name, Path = seriesItem.Path },
+                Medias = medias,
+                MissingEpisodes = missingEpisodes.Select(x => $"S{x.SeasonNumber:D2}E{x.EpisodeNumber:D2}").ToList()
+            };
         }).ToArray();
         await Task.WhenAll(tasks);
-        var result = tasks.SelectMany(x => x.Result).OrderBy(x => x.Series).ThenBy(x => x.Episode).ToList();
+        var result = tasks.Select(x => x.Result)
+            .Where(x => x is not null)
+            .OrderBy(x => x?.Series.Title).ToList();
         return Ok(result);
     }
 }
