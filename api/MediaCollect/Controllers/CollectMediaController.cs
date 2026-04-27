@@ -74,7 +74,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
                     downloadTask.Status = TaskStatus.Completed;
                     downloadTask.Media.EndTime = DateTimeOffset.Now;
                     downloadTask.Media.SavePath = Path.Combine(savePath, $"{media.Episode}{media.FileType}");
-                    Db.Insertable(downloadTask.Media).ExecuteCommand();
+                    Db.Insertable(downloadTask.Media).ExecuteReturnSnowflakeIdAsync();
                 },
                 _ => { downloadTask.Status = TaskStatus.Failed; }
             )
@@ -138,7 +138,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
             media.SavePath = Path.Combine(App.MediaPath, media.Series, $"{media.Episode}{media.FileType}");
             media.StartTime = DateTimeOffset.Now;
             media.EndTime = DateTimeOffset.Now;
-            await Db.Insertable(media).ExecuteCommandAsync();
+            await Db.Insertable(media).ExecuteReturnSnowflakeIdAsync();
         }
 
         return Ok();
