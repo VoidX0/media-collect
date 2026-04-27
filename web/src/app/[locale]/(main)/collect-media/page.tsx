@@ -2,12 +2,12 @@
 
 import { DownloadTask } from '@/api/generatedSchemas'
 import Pending from '@/components/collect-media/pending'
-import Processing from '@/components/collect-media/processing'
+import TaskGroup from '@/components/collect-media/task-group'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { openapi } from '@/lib/http'
 import { LayoutList, ListChecks, ListTodo } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export default function Page() {
   const t = useTranslations('CollectMediaPage')
@@ -22,9 +22,19 @@ export default function Page() {
     }
     fetch().then()
   }, [])
+  const processedTasks = useMemo(
+    () =>
+      allTasks?.filter(
+        (t) => t.status === 1 || t.status === 2 || t.status === 3,
+      ) ?? [],
+    [allTasks],
+  )
+  const completedTasks = useMemo(
+    () => allTasks?.filter((t) => t.status === 4 || t.status === 5) ?? [],
+    [allTasks],
+  )
   // 激活的标签页
   const [activeTab, setActiveTab] = useState('pending')
-  // 根据下载任务状态确定默认标签页
   useEffect(() => {
     if (!allTasks) return
     // 准备中、下载中、处理中
@@ -51,10 +61,12 @@ export default function Page() {
             <LayoutList className="h-4 w-4" /> {t('pending')}
           </TabsTrigger>
           <TabsTrigger value="processing" className="flex items-center gap-2">
-            <ListTodo className="h-4 w-4" /> {t('processing')}
+            <ListTodo className="h-4 w-4" /> {t('processing')}(
+            {processedTasks?.length})
           </TabsTrigger>
           <TabsTrigger value="completed" className="flex items-center gap-2">
-            <ListChecks className="h-4 w-4" /> {t('completed')}
+            <ListChecks className="h-4 w-4" /> {t('completed')}(
+            {completedTasks?.length})
           </TabsTrigger>
         </TabsList>
 
@@ -63,10 +75,12 @@ export default function Page() {
         </TabsContent>
 
         <TabsContent value="processing">
-          <Processing allTasks={allTasks ?? []} />
+          <TaskGroup tasks={processedTasks} />
         </TabsContent>
 
-        <TabsContent value="completed"></TabsContent>
+        <TabsContent value="completed">
+          <TaskGroup tasks={completedTasks} />
+        </TabsContent>
       </Tabs>
     </div>
   )

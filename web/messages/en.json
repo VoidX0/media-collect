@@ -177,11 +177,15 @@
     "processing": "Processing",
     "completed": "Completed",
     "noPendingMedia": "No pending media",
-    "noProcessingMedia": "No media currently processing",
-    "noCompletedMedia": "No completed media",
+    "noMedia": "No media found",
     "selectEpisodeAndType": "Please select episode and media type",
     "addCompleteTaskSuccess": "Marked as completed successfully",
-    "addDownloadTaskSuccess": "Download task added successfully"
+    "addDownloadTaskSuccess": "Download task added successfully",
+    "taskStatus1": "Waiting for Download",
+    "taskStatus2": "Downloading",
+    "taskStatus3": "Processing with Sonarr",
+    "taskStatus4": "Completed",
+    "taskStatus5": "Download Failed"
   },
   "MessageCode": {
     "Unauthorized": "Unauthorized access",

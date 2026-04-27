@@ -177,11 +177,15 @@
     "processing": "处理中",
     "completed": "已完成",
     "noPendingMedia": "暂无待处理的媒体",
-    "noProcessingMedia": "暂无正在处理的媒体",
-    "noCompletedMedia": "暂无已完成的媒体",
+    "noMedia": "暂无媒体",
     "selectEpisodeAndType": "请选择剧集和媒体类型",
     "addCompleteTaskSuccess": "已成功标记为完成",
-    "addDownloadTaskSuccess": "已成功添加下载任务"
+    "addDownloadTaskSuccess": "已成功添加下载任务",
+    "taskStatus1": "等待下载",
+    "taskStatus2": "下载中",
+    "taskStatus3": "Sonarr处理中",
+    "taskStatus4": "已完成",
+    "taskStatus5": "下载失败"
   },
   "MessageCode": {
     "Unauthorized": "无权限访问",
