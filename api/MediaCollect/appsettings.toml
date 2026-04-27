@@ -60,3 +60,8 @@ Uri = "" # 服务器地址
 Username = "" # 用户名
 Password = "" # 密码
 MediaDirectory = "" # 媒体存储目录
+
+# Sonarr配置
+[SonarrOptions]
+BaseUrl = "" # Sonarr地址
+ApiKey = "" # Sonarr API密钥

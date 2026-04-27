@@ -126,11 +126,11 @@ public class CollectMediaController : OrmController<CollectedMedia>
     }
 
     /// <summary>
-    /// 获取待处理的媒体文件列表
+    /// 获取待处理的Series
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    public async Task<ActionResult<List<PendingSeries>>> PendingMedia()
+    public async Task<ActionResult<List<PendingSeries>>> PendingSeries()
     {
         var collected = await Db.Queryable<CollectedMedia>().ToListAsync();
         var davSeries = await _webDavService.List();
