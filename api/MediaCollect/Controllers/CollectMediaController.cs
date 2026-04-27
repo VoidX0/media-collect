@@ -137,10 +137,13 @@ public class CollectMediaController : OrmController<CollectedMedia>
             // 设置媒体完成信息
             media.StartTime = DateTimeOffset.Now;
             media.EndTime = DateTimeOffset.Now;
-            await Db.Insertable(media).ExecuteReturnSnowflakeIdAsync();
         }
 
-        return Ok();
+        var result = await Db.AsTenant().UseTranAsync(async () =>
+        {
+            await Db.Insertable(medias).ExecuteReturnSnowflakeIdAsync();
+        });
+        return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
     }
 
     /// <summary>
