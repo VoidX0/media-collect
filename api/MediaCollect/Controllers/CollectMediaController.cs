@@ -141,7 +141,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
 
         var result = await Db.AsTenant().UseTranAsync(async () =>
         {
-            await Db.Insertable(medias).ExecuteReturnSnowflakeIdAsync();
+            await Db.Insertable(medias).ExecuteReturnSnowflakeIdListAsync();
         });
         return result.IsSuccess ? Ok() : BadRequest(result.ErrorMessage);
     }
@@ -195,6 +195,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
                     Series = seriesItem.Name,
                     Episode = Path.GetFileNameWithoutExtension(mediaItem.Name)
                 }).ToList();
+            if (medias.Count == 0) return null; // 没有需要处理的媒体文件
             // 返回封装后的信息
             return new PendingSeries
             {
