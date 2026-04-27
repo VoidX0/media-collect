@@ -42,6 +42,7 @@ builder.Services.AddSingleton<SonarrService>(); // Sonarr服务
 var app = builder.Build();
 App.Application = app; // 全局App
 await app.FfmpegInit(); // ffmpeg初始化
+await app.CleanTmp(); // 启动时清理临时文件
 app.ApiLogs(); // 启用API日志
 app.ApiReference(); // 启用API参考
 app.ApiHangfire(); // 启用Hangfire仪表盘

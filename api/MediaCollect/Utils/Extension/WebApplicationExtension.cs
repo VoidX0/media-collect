@@ -156,5 +156,32 @@ public static class WebApplicationExtension
                 ]
             });
         }
+
+        /// <summary>
+        /// 清理临时文件
+        /// </summary>
+        public async Task CleanTmp()
+        {
+            await Task.CompletedTask;
+            var logger = Log.ForContext<Program>();
+            if (!Directory.Exists(App.MediaPath)) return;
+            var subDirs = Directory.GetDirectories(App.MediaPath);
+            foreach (var subDir in subDirs)
+            {
+                var tmpFiles = Directory.GetFiles(subDir, "*.tmp", SearchOption.TopDirectoryOnly);
+                foreach (var tmpFile in tmpFiles)
+                {
+                    try
+                    {
+                        File.Delete(tmpFile);
+                        logger.Information("Deleted temporary file: {FilePath}", tmpFile);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.Warning(e, "Failed to delete temporary file: {FilePath}", tmpFile);
+                    }
+                }
+            }
+        }
     }
 }
