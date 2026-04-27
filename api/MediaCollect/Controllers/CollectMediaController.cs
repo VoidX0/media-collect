@@ -174,7 +174,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
         var tasks = davSeries.Content.Where(x => x.IsCollection).Select(async seriesItem =>
         {
             var media = await _webDavService.List(seriesItem.Path);
-            if (!media.IsSuccess || media.Content is null) return null; // 没有需要处理的媒体文件
+            if (!media.IsSuccess || media.Content is null || media.Content.Count == 0) return null; // 没有需要处理的媒体文件
             // 找到对应的信息
             var sonarr = sonarrSeries.Content?.FirstOrDefault(x =>
                 x.Path.Contains(seriesItem.Name, StringComparison.CurrentCultureIgnoreCase));
