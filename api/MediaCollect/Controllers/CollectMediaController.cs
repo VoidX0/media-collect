@@ -119,6 +119,32 @@ public class CollectMediaController : OrmController<CollectedMedia>
     }
 
     /// <summary>
+    /// 将媒体标记为已完成
+    /// </summary>
+    /// <param name="medias"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ActionResult> AddCompleteTask(List<CollectedMedia> medias)
+    {
+        foreach (var media in medias)
+        {
+            // 检查是否已存在下载任务
+            if (App.DownloadTasks.Any(x => x.Media.OriginalPath == media.OriginalPath))
+                return BadRequest(MessageCodeEnum.TaskExists.ToMessageCode(media.OriginalPath));
+            // 检查是否已存在收录记录
+            if (await Db.Queryable<CollectedMedia>().AnyAsync(x => x.OriginalPath == media.OriginalPath))
+                return BadRequest(MessageCodeEnum.MediaExists.ToMessageCode(media.OriginalPath));
+            // 设置媒体完成信息
+            media.SavePath = Path.Combine(App.MediaPath, media.Series, $"{media.Episode}{media.FileType}");
+            media.StartTime = DateTimeOffset.Now;
+            media.EndTime = DateTimeOffset.Now;
+            await Db.Insertable(media).ExecuteCommandAsync();
+        }
+
+        return Ok();
+    }
+
+    /// <summary>
     /// 获取下载任务列表
     /// </summary>
     /// <returns></returns>
@@ -180,5 +206,36 @@ public class CollectMediaController : OrmController<CollectedMedia>
             .Where(x => x is not null)
             .OrderBy(x => x?.Series.Title).ToList();
         return Ok(result);
+    }
+
+    /// <summary>
+    /// 删除已完成的任务记录
+    /// </summary>
+    /// <param name="medias"></param>
+    /// <returns></returns>
+    [HttpDelete]
+    public async Task<ActionResult> RemoveCompleteTask(List<CollectedMedia> medias)
+    {
+        foreach (var media in medias)
+        {
+            var record = await Db.Queryable<CollectedMedia>()
+                .FirstAsync(x => x.OriginalPath == media.OriginalPath);
+            if (record is null) continue;
+            // 如果有对应的任务，把任务也删除
+            var task = App.DownloadTasks.FirstOrDefault(x => x.Media.OriginalPath == record.OriginalPath);
+            if (task is not null)
+            {
+                task.CurrentTask?.Wait(10 * 1000); // 等待任务完成
+                App.DownloadTasks.TryTake(out _); // 从任务列表中移除
+            }
+
+            // 删除文件
+            var file = new FileInfo(record.SavePath);
+            if (file.Exists) file.Delete();
+            // 删除记录
+            await Db.Deleteable(record).ExecuteCommandAsync();
+        }
+
+        return Ok();
     }
 }
