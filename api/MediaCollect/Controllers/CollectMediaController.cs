@@ -135,7 +135,6 @@ public class CollectMediaController : OrmController<CollectedMedia>
             if (await Db.Queryable<CollectedMedia>().AnyAsync(x => x.OriginalPath == media.OriginalPath))
                 return BadRequest(MessageCodeEnum.MediaExists.ToMessageCode(media.OriginalPath));
             // 设置媒体完成信息
-            media.SavePath = Path.Combine(App.MediaPath, media.Series, $"{media.Episode}{media.FileType}");
             media.StartTime = DateTimeOffset.Now;
             media.EndTime = DateTimeOffset.Now;
             await Db.Insertable(media).ExecuteReturnSnowflakeIdAsync();
