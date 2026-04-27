@@ -96,6 +96,9 @@ public class CollectMediaController : OrmController<CollectedMedia>
             // 检查是否已存在下载任务
             if (App.DownloadTasks.Any(x => x.Media.OriginalPath == media.OriginalPath))
                 return BadRequest(MessageCodeEnum.TaskExists.ToMessageCode(media.OriginalPath));
+            // 检查相同目标任务
+            if (App.DownloadTasks.Any(x => x.Media.Episode == media.Episode && x.Media.Series == media.Series))
+                return BadRequest(MessageCodeEnum.FileExists.ToMessageCode($"{media.Series} - {media.Episode}"));
             // 检查是否已存在收录记录
             if (await Db.Queryable<CollectedMedia>().AnyAsync(x => x.OriginalPath == media.OriginalPath))
                 return BadRequest(MessageCodeEnum.MediaExists.ToMessageCode(media.OriginalPath));
