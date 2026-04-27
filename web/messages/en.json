@@ -171,6 +171,18 @@
     "saveConfig": "Save Configuration"
   },
   "DashboardPage": {},
+  "CollectMediaPage": {
+    "loading": "Loading...",
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "noPendingMedia": "No pending media",
+    "noProcessingMedia": "No media currently processing",
+    "noCompletedMedia": "No completed media",
+    "selectEpisodeAndType": "Please select episode and media type",
+    "addCompleteTaskSuccess": "Marked as completed successfully",
+    "addDownloadTaskSuccess": "Download task added successfully"
+  },
   "MessageCode": {
     "Unauthorized": "Unauthorized access",
     "FileEmpty": "File cannot be empty",
@@ -200,6 +212,7 @@
     "AvatarNotFound": "User has not set an avatar",
     "WebDavQueryFailed": "WebDav query failed",
     "TaskExists": "This task already exists: {0}",
+    "FileExists": "This file is currently downloading or has already been downloaded: {0}",
     "MediaExists": "This media already exists: {0}",
     "SeriesNotExists": "This series directory does not exist: {0}"
   }

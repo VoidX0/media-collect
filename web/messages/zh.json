@@ -171,6 +171,18 @@
     "saveConfig": "保存配置"
   },
   "DashboardPage": {},
+  "CollectMediaPage": {
+    "loading": "加载中...",
+    "pending": "待处理",
+    "processing": "处理中",
+    "completed": "已完成",
+    "noPendingMedia": "暂无待处理的媒体",
+    "noProcessingMedia": "暂无正在处理的媒体",
+    "noCompletedMedia": "暂无已完成的媒体",
+    "selectEpisodeAndType": "请选择剧集和媒体类型",
+    "addCompleteTaskSuccess": "已成功标记为完成",
+    "addDownloadTaskSuccess": "已成功添加下载任务"
+  },
   "MessageCode": {
     "Unauthorized": "无权限访问",
     "FileEmpty": "文件不能为空",
@@ -200,6 +212,7 @@
     "AvatarNotFound": "用户未设置头像",
     "WebDavQueryFailed": "WebDav查询失败",
     "TaskExists": "该任务已存在: {0}",
+    "FileExists": "该文件正在下载或已下载: {0}",
     "MediaExists": "该媒体已存在: {0}",
     "SeriesNotExists": "该剧集目录不存在: {0}"
   }

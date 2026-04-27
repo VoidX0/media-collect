@@ -1420,6 +1420,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/CollectMedia/AddCompleteTask": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 将媒体标记为已完成 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CollectedMedia"][];
+                    "text/json": components["schemas"]["CollectedMedia"][];
+                    "application/*+json": components["schemas"]["CollectedMedia"][];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MessageCode"];
+                        "application/json": components["schemas"]["MessageCode"];
+                        "text/json": components["schemas"]["MessageCode"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/CollectMedia/DownloadTasks": {
         parameters: {
             query?: never;
@@ -1469,14 +1520,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/CollectMedia/PendingMedia": {
+    "/CollectMedia/PendingSeries": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** 获取待处理的媒体文件列表 */
+        /** 获取待处理的Series */
         get: {
             parameters: {
                 query?: never;
@@ -1492,9 +1543,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["CollectedMedia"][];
-                        "application/json": components["schemas"]["CollectedMedia"][];
-                        "text/json": components["schemas"]["CollectedMedia"][];
+                        "text/plain": components["schemas"]["PendingSeries"][];
+                        "application/json": components["schemas"]["PendingSeries"][];
+                        "text/json": components["schemas"]["PendingSeries"][];
                     };
                 };
                 /** @description Bad Request */
@@ -1513,6 +1564,57 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/CollectMedia/RemoveCompleteTask": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 删除已完成的任务记录 */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CollectedMedia"][];
+                    "text/json": components["schemas"]["CollectedMedia"][];
+                    "application/*+json": components["schemas"]["CollectedMedia"][];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MessageCode"];
+                        "application/json": components["schemas"]["MessageCode"];
+                        "text/json": components["schemas"]["MessageCode"];
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -1958,6 +2060,7 @@ export interface components {
         DownloadTask: {
             /** @description 媒体信息 */
             media: components["schemas"]["CollectedMedia"];
+            series?: null | components["schemas"]["SonarrSeries"];
             currentTask?: null | components["schemas"]["Task"];
             /** @description 任务状态 */
             status?: components["schemas"]["TaskStatus"];
@@ -2018,6 +2121,7 @@ export interface components {
          *     | AvatarNotFound | 用户未设置头像 |
          *     | WebDavQueryFailed | WebDav查询失败 |
          *     | TaskExists | 该任务已存在: {0} |
+         *     | FileExists | 该文件正在下载或已下载: {0} |
          *     | MediaExists | 该媒体已存在: {0} |
          *     | SeriesNotExists | 该剧集目录不存在: {0} |
          */
@@ -2051,6 +2155,15 @@ export interface components {
             hasPreviousPage?: boolean;
             /** @description 是否有下一页 */
             hasNextPage?: boolean;
+        };
+        /** @description 待处理系列信息 */
+        PendingSeries: {
+            /** @description 媒体列表 */
+            medias?: components["schemas"]["CollectedMedia"][];
+            /** @description Sonarr系列信息 */
+            series?: components["schemas"]["SonarrSeries"];
+            /** @description Sonarr缺失的集信息 */
+            missingEpisodes?: components["schemas"]["SonarrEpisode"][];
         };
         QueryCondition: {
             /** @description 字段名 */
@@ -2109,6 +2222,35 @@ export interface components {
             fields?: components["schemas"]["SchemaField"][];
             /** @description 字段描述（可选） */
             sampleData?: unknown;
+        };
+        /** @description Sonarr集 */
+        SonarrEpisode: {
+            /**
+             * Format: int32
+             * @description 季
+             */
+            seasonNumber?: number | string;
+            /**
+             * Format: int32
+             * @description 集
+             */
+            episodeNumber?: number | string;
+            /** @description 标题 */
+            title?: string;
+            /** @description 是否有文件 */
+            hasFile?: boolean;
+        };
+        /** @description Sonarr系列 */
+        SonarrSeries: {
+            /**
+             * Format: int32
+             * @description ID
+             */
+            id?: number | string;
+            /** @description 标题 */
+            title?: string;
+            /** @description 路径 */
+            path?: string;
         };
         /** @description 系统控制器 */
         SystemController: {

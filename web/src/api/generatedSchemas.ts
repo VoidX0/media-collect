@@ -96,6 +96,9 @@ export const schemas = {
       type: '{ id?: string | number | undefined; startTime?: string | undefined; endTime?: string | null | undefined; originalPath?: string | undefined; savePath?: string | undefined; fileSize?: string | number | undefined; fileType?: string | undefined; series?: string | undefined; episode?: string | undefined; }',
       description: '媒体信息',
     },
+    series: {
+      type: '{ id?: string | number | undefined; title?: string | undefined; path?: string | undefined; } | null | undefined',
+    },
     currentTask: {
       type: '{ id?: string | number | undefined; exception?: { innerExceptions?: { targetSite?: unknown; message?: string | null | undefined; data?: Record<string, never> | null | undefined; innerException?: any | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; }[] | null | undefined; message?: string | null | undefined; targetSite?: unknown; data?: Record<string, never> | null | undefined; innerException?: { targetSite?: unknown; message?: string | null | undefined; data?: Record<string, never> | null | undefined; innerException?: any | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; } | undefined; helpLink?: string | null | undefined; source?: string | null | undefined; hResult?: string | number | undefined; stackTrace?: string | null | undefined; } | undefined; status?: number | undefined; isCanceled?: boolean | undefined; isCompleted?: boolean | undefined; isCompletedSuccessfully?: boolean | undefined; creationOptions?: number | undefined; asyncState?: unknown; isFaulted?: boolean | undefined; } | null | undefined',
     },
@@ -187,6 +190,20 @@ export const schemas = {
       description: '是否有下一页',
     },
   },
+  PendingSeries: {
+    medias: {
+      type: '{ id?: string | number | undefined; startTime?: string | undefined; endTime?: string | null | undefined; originalPath?: string | undefined; savePath?: string | undefined; fileSize?: string | number | undefined; fileType?: string | undefined; series?: string | undefined; episode?: string | undefined; }[] | undefined',
+      description: '媒体列表',
+    },
+    series: {
+      type: '{ id?: string | number | undefined; title?: string | undefined; path?: string | undefined; } | undefined',
+      description: 'Sonarr系列信息',
+    },
+    missingEpisodes: {
+      type: '{ seasonNumber?: string | number | undefined; episodeNumber?: string | number | undefined; title?: string | undefined; hasFile?: boolean | undefined; }[] | undefined',
+      description: 'Sonarr缺失的集信息',
+    },
+  },
   QueryCondition: {
     fieldName: {
       type: 'string | undefined',
@@ -271,6 +288,41 @@ export const schemas = {
     sampleData: {
       type: 'unknown',
       description: '字段描述（可选）',
+    },
+  },
+  SonarrEpisode: {
+    seasonNumber: {
+      type: 'string | number | undefined',
+      description: '季',
+      format: 'int32',
+    },
+    episodeNumber: {
+      type: 'string | number | undefined',
+      description: '集',
+      format: 'int32',
+    },
+    title: {
+      type: 'string | undefined',
+      description: '标题',
+    },
+    hasFile: {
+      type: 'boolean | undefined',
+      description: '是否有文件',
+    },
+  },
+  SonarrSeries: {
+    id: {
+      type: 'string | number | undefined',
+      description: 'ID',
+      format: 'int32',
+    },
+    title: {
+      type: 'string | undefined',
+      description: '标题',
+    },
+    path: {
+      type: 'string | undefined',
+      description: '路径',
     },
   },
   SystemController: {
@@ -382,12 +434,15 @@ export type MessageCodeEnum = components['schemas']['MessageCodeEnum']
 export type MethodBase = components['schemas']['MethodBase']
 export type PagedResultOfCollectedMedia =
   components['schemas']['PagedResultOfCollectedMedia']
+export type PendingSeries = components['schemas']['PendingSeries']
 export type QueryCondition = components['schemas']['QueryCondition']
 export type QueryDto = components['schemas']['QueryDto']
 export type QueryOrder = components['schemas']['QueryOrder']
 export type SchemaAiRequest = components['schemas']['SchemaAiRequest']
 export type SchemaField = components['schemas']['SchemaField']
 export type SchemaInfo = components['schemas']['SchemaInfo']
+export type SonarrEpisode = components['schemas']['SonarrEpisode']
+export type SonarrSeries = components['schemas']['SonarrSeries']
 export type SystemController = components['schemas']['SystemController']
 export type SystemRole = components['schemas']['SystemRole']
 export type SystemUser = components['schemas']['SystemUser']
