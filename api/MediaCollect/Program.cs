@@ -36,6 +36,7 @@ builder.Services.AddSingleton<SmtpService>(); // SMTP邮箱服务
 builder.Services.AddSingleton<AiService>(); // AI服务
 builder.Services.AddSingleton<ScheduledJob>(); // 定时任务
 builder.Services.AddSingleton<WebDavService>(); // WebDav服务
+builder.Services.AddSingleton<SonarrService>(); // Sonarr服务
 
 // 构建App
 var app = builder.Build();
