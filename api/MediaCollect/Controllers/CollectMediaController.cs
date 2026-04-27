@@ -113,31 +113,26 @@ public class CollectMediaController : OrmController<CollectedMedia>
         var series = await _webDavService.List();
         if (!series.IsSuccess || series.Content is null)
             return BadRequest(MessageCodeEnum.WebDavQueryFailed.ToMessageCode());
-        // 遍历处理系列
-        var result = new List<CollectedMedia>();
-        foreach (var seriesItem in series.Content)
+        // 并行查询每个剧集下的媒体文件
+        var tasks = series.Content.Where(x => x.IsCollection).Select(async seriesItem =>
         {
-            if (!seriesItem.IsCollection) continue; // 只处理文件夹
             var media = await _webDavService.List(seriesItem.Path);
-            if (!media.IsSuccess || media.Content is null) continue;
-            // 遍历处理媒体文件
-            foreach (var mediaItem in media.Content)
-            {
-                if (App.DownloadTasks.Any(x => x.Media.OriginalPath == mediaItem.Path)) continue; // 已添加下载任务的媒体文件
-                if (collected.Any(x => x.OriginalPath == mediaItem.Path)) continue; // 已收录的媒体文件
-                if (mediaItem.IsCollection) continue; // 只处理文件
-                result.Add(new CollectedMedia
+            if (!media.IsSuccess || media.Content is null) return [];
+            return media.Content.Where(mediaItem =>
+                    App.DownloadTasks.All(x => x.Media.OriginalPath != mediaItem.Path) && // 已添加下载任务的媒体文件
+                    collected.All(x => x.OriginalPath != mediaItem.Path) && // 已收录的媒体文件
+                    !mediaItem.IsCollection) // 只处理文件
+                .Select(mediaItem => new CollectedMedia
                 {
                     OriginalPath = mediaItem.Path,
                     FileSize = mediaItem.ContentLength ?? 0,
                     FileType = Path.GetExtension(mediaItem.Path),
                     Series = seriesItem.Name,
                     Episode = Path.GetFileNameWithoutExtension(mediaItem.Name)
-                });
-            }
-        }
-
-        result = result.OrderBy(x => x.Series).ThenBy(x => x.Episode).ToList();
+                }).ToList();
+        }).ToArray();
+        await Task.WhenAll(tasks);
+        var result = tasks.SelectMany(x => x.Result).OrderBy(x => x.Series).ThenBy(x => x.Episode).ToList();
         return Ok(result);
     }
 }
