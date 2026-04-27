@@ -2,7 +2,7 @@ name: Docker Image CI
 on:
   push:
     branches:
-      - mainDEV # 推送到主分支时触发
+      - main # 推送到主分支时触发
     paths:
       - 'api/**'
       - 'web/**'
