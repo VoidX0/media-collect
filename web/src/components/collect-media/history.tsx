@@ -47,6 +47,7 @@ export default function History() {
       const body: QueryDto = {
         pageNumber: 1,
         pageSize: 999999999,
+        order: [{ fieldName: 'EndTime', orderByType: 1 }],
       }
       const { data } = await openapi.POST('/CollectMedia/Query', { body })
       setMedias(data?.items)
