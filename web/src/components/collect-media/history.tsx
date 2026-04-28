@@ -1,4 +1,5 @@
-import { CollectedMedia, QueryDto } from '@/api/generatedSchemas'
+import { CollectedMedia } from '@/api/generatedSchemas'
+import { getMedias, groups } from '@/app/[locale]/(main)/collect-media/media'
 import {
   Accordion,
   AccordionContent,
@@ -22,20 +23,6 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-// 根据series分组下载媒体列表
-const groups = (medias: CollectedMedia[]) => {
-  const seriesMap: Record<string, CollectedMedia[]> = {}
-  medias.forEach((t) => {
-    const series = t.series || 'unknown'
-    if (!seriesMap[series]) seriesMap[series] = []
-    seriesMap[series].push(t)
-  })
-  return Object.entries(seriesMap).map(([series, items]) => ({
-    series,
-    items,
-  }))
-}
-
 export default function History() {
   const t = useTranslations('CollectMediaPage')
   const [loading, setLoading] = useState(false)
@@ -44,13 +31,7 @@ export default function History() {
   useEffect(() => {
     const fetch = async () => {
       setLoading(true)
-      const body: QueryDto = {
-        pageNumber: 1,
-        pageSize: 999999999,
-        order: [{ fieldName: 'EndTime', orderByType: 1 }],
-      }
-      const { data } = await openapi.POST('/CollectMedia/Query', { body })
-      setMedias(data?.items)
+      setMedias(await getMedias())
       setLoading(false)
     }
     fetch().then()
