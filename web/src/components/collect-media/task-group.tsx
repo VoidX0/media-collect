@@ -97,8 +97,18 @@ export default function TaskGroup({ tasks }: { tasks: DownloadTask[] }) {
                               <span>
                                 {t(`taskStatus${item.status}` as never)}
                               </span>
+                              <span>
+                                {(
+                                  ((item.status === 4 || item.status === 5
+                                    ? Number(item.media.endTime)
+                                    : Date.now()) -
+                                    Number(item.media.startTime)) /
+                                  1000
+                                ).toFixed(2)}
+                                s
+                              </span>
                               <span className="ml-auto">
-                                {Number(item.progress).toFixed(1)}%
+                                {Number(item.progress).toFixed(2)}%
                               </span>
                             </FieldLabel>
                             <Progress
