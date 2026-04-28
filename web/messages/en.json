@@ -171,7 +171,11 @@
     "saveConfig": "Save Configuration"
   },
   "DashboardPage": {
-    "mediaTrend": "Media Trends"
+    "mediaTrend": "Media Processing Trend",
+    "storageDistribution": "Storage Distribution",
+    "fileTypeRatio": "File Type Ratio",
+    "processDuration": "Processing Duration Analysis",
+    "seriesProgress": "Series Update Progress"
   },
   "CollectMediaPage": {
     "loading": "Loading...",

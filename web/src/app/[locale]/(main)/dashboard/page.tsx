@@ -5,13 +5,28 @@ import { getMedias } from '@/app/[locale]/(main)/collect-media/media'
 import UniversalChart from '@/components/chart/universal-chart'
 import { formatDate } from '@/lib/date-time'
 import { EChartsOption } from 'echarts'
-import { LineChart } from 'echarts/charts'
+import { BarChart, LineChart, PieChart, ScatterChart } from 'echarts/charts'
 import * as echarts from 'echarts/core'
 import { Loader } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
-echarts.use([LineChart])
+echarts.use([LineChart, PieChart, BarChart, ScatterChart])
+
+/** 提取通用的基础配置 */
+const COMMON_CHART_CONFIG = {
+  grid: {
+    left: '3%',
+    right: '3%',
+    top: '10%',
+    bottom: '15%',
+    containLabel: true,
+  },
+  legend: {
+    bottom: -5,
+    type: 'scroll' as const,
+  },
+}
 
 export default function Page() {
   const t = useTranslations('DashboardPage')
@@ -27,16 +42,15 @@ export default function Page() {
     fetch().then()
   }, [])
 
-  // 按天分组趋势图
+  // 1. 处理趋势图 (已有的堆叠面积图)
   const optionsByDay = useMemo(() => {
-    if (!medias || !medias.length) return {}
-    // 1. 数据清洗与分组统计
+    if (!medias?.length) return {}
     const dateSeriesMap: Record<string, Record<string, number>> = {}
     const allSeries = new Set<string>()
     const allDates = new Set<string>()
+
     medias.forEach((item) => {
       if (!item.endTime) return
-      // 提取日期部分 (YYYY-MM-DD)
       const date = formatDate(new Date(Number(item.endTime)))
       const seriesName = item.series || 'Unknown'
       allDates.add(date)
@@ -46,91 +60,166 @@ export default function Page() {
         (dateSeriesMap[date][seriesName] || 0) + 1
     })
 
-    // 2. 排序日期，确保横轴连续
     const sortedDates = Array.from(allDates).sort()
     const seriesList = Array.from(allSeries)
-    // 3. 构建 Dataset 数据源 (第一行为维度名称)
-    // 格式: [['date', 'Series1', 'Series2'], ['2023-01-01', 10, 5], ...]
     const datasetSource = [
       ['date', ...seriesList],
-      ...sortedDates.map((date) => {
-        return [date, ...seriesList.map((s) => dateSeriesMap[date]![s] || 0)]
-      }),
+      ...sortedDates.map((date) => [
+        date,
+        ...seriesList.map((s) => dateSeriesMap[date]![s] || 0),
+      ]),
     ]
 
-    // 4. 构建 Series 配置 (每个系列对应 dataset 中的一列)
-    const seriesConfig = seriesList.map((name) => ({
-      type: 'line',
-      name: name,
-      stack: 'Total', // 开启堆叠
-      areaStyle: {}, // 开启面积图
-      emphasis: { focus: 'series' },
-      smooth: true,
-      encode: {
-        x: 'date',
-        y: name,
-      },
-    }))
-
     return {
+      ...COMMON_CHART_CONFIG,
       tooltip: {
         trigger: 'axis',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         formatter: (params: any) => {
-          const filteredParams = params
+          const filtered = params.filter(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .filter((item: any) => {
-              // 在 time 轴下，数据可能被存储在 item.value 数组中
-              // 索引 0 是时间，后续索引对应各个 series
-              return item.value[item.encode.y[0]] > 0
-            })
-            .sort(
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (a: any, b: any) =>
-                b.value[b.encode.y[0]] - a.value[a.encode.y[0]],
-            )
-
-          if (filteredParams.length === 0) return ''
-
-          // 时间轴下 params[0].axisValue 是时间戳，需要格式化
+            (item: any) => item.value[item.encode.y[0]] > 0,
+          )
+          if (!filtered.length) return ''
           const dateTitle = formatDate(new Date(params[0].axisValue))
-          let html = `${dateTitle}<br/>`
-
-          filteredParams.forEach((item: any) => {
-            const value = item.value[item.encode.y[0]]
-            html += `${item.marker} ${item.seriesName}: <b>${value}</b><br/>`
+          let res = `${dateTitle}<br/>`
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          filtered.forEach((item: any) => {
+            res += `${item.marker} ${item.seriesName}: <b>${item.value[item.encode.y[0]]}</b><br/>`
           })
-          return html
+          return res
         },
       },
-      legend: {
-        data: seriesList,
-        bottom: -5,
-        type: 'scroll',
-      },
-      grid: {
-        left: '3%',
-        right: '3%',
-        top: '3%',
-        bottom: '12%',
-        containLabel: true,
-      },
-      dataset: {
-        source: datasetSource,
-      },
-      xAxis: {
-        type: 'time',
-        boundaryGap: false,
-        axisLabel: {
-          formatter: '{yyyy}-{MM}-{dd}',
-        },
-      },
-      yAxis: {
-        type: 'value',
-      },
+      dataset: { source: datasetSource },
+      xAxis: { type: 'time', boundaryGap: false },
+      yAxis: { type: 'value' },
       dataZoom: [{ type: 'inside' }, { type: 'slider' }],
-      series: seriesConfig,
+      series: seriesList.map((name) => ({
+        type: 'line',
+        name,
+        stack: 'Total',
+        areaStyle: {},
+        smooth: true,
+        emphasis: { focus: 'series' },
+        encode: { x: 'date', y: name },
+      })),
     } as unknown as EChartsOption
+  }, [medias])
+
+  // 2. 存储占用环形图
+  const storageOption = useMemo(() => {
+    if (!medias?.length) return {}
+    const map: Record<string, number> = {}
+    medias.forEach((item) => {
+      const name = item.series || 'Unknown'
+      map[name] = (map[name] || 0) + (Number(item.fileSize) || 0)
+    })
+    const data = Object.entries(map)
+      .map(([name, value]) => ({
+        name,
+        value: Number((value / 1024 ** 3).toFixed(2)),
+      }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10)
+
+    return {
+      tooltip: { trigger: 'item', formatter: '{b}: {c} GB ({d}%)' },
+      legend: COMMON_CHART_CONFIG.legend,
+      series: [
+        {
+          type: 'pie',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          itemStyle: { borderRadius: 8, borderWidth: 2 },
+          label: { show: false },
+          data,
+        },
+      ],
+    } as EChartsOption
+  }, [medias])
+
+  // 3. 文件类型占比环形图
+  const fileTypeOption = useMemo(() => {
+    if (!medias?.length) return {}
+    const map: Record<string, number> = {}
+    medias.forEach((item) => {
+      const type = item.fileType || 'Unknown'
+      map[type] = (map[type] || 0) + 1
+    })
+    return {
+      tooltip: { trigger: 'item' },
+      legend: COMMON_CHART_CONFIG.legend,
+      series: [
+        {
+          type: 'pie',
+          radius: ['40%', '70%'],
+          itemStyle: { borderRadius: 8, borderWidth: 2 },
+          label: { show: false },
+          data: Object.entries(map).map(([name, value]) => ({ name, value })),
+        },
+      ],
+    } as EChartsOption
+  }, [medias])
+
+  // 4. 耗时分析图 (散点图)
+  const durationOption = useMemo(() => {
+    if (!medias?.length) return {}
+    const data = medias
+      .filter((item) => item.startTime && item.endTime)
+      .map((item) => [
+        new Date(Number(item.startTime)).getTime(),
+        Math.max(
+          0,
+          (new Date(Number(item.endTime)).getTime() -
+            new Date(Number(item.startTime)).getTime()) /
+            1000,
+        ),
+        item.series || 'Unknown',
+      ])
+
+    return {
+      ...COMMON_CHART_CONFIG,
+      tooltip: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        formatter: (params: any) => {
+          const val = params.value
+          return `${val[2]}<br/>${val[1] > 60 ? (val[1] / 60).toFixed(1) + 'm' : val[1] + 's'}`
+        },
+      },
+      xAxis: { type: 'time' },
+      yAxis: { type: 'value', name: 'Seconds' },
+      series: [
+        { type: 'scatter', symbolSize: 8, data, itemStyle: { opacity: 0.6 } },
+      ],
+    } as EChartsOption
+  }, [medias])
+
+  // 5. 系列更新进度 (水平柱状图)
+  const seriesProgressOption = useMemo(() => {
+    if (!medias?.length) return {}
+    const map: Record<string, number> = {}
+    medias.forEach((item) => {
+      const name = item.series || 'Unknown'
+      map[name] = (map[name] || 0) + 1
+    })
+    const data = Object.entries(map)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .reverse()
+
+    return {
+      ...COMMON_CHART_CONFIG,
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      xAxis: { type: 'value' },
+      yAxis: { type: 'category', data: data.map((d) => d[0]) },
+      series: [
+        {
+          type: 'bar',
+          data: data.map((d) => d[1]),
+          itemStyle: { borderRadius: [0, 4, 4, 0] },
+        },
+      ],
+    } as EChartsOption
   }, [medias])
 
   if (loading) {
@@ -145,12 +234,40 @@ export default function Page() {
 
   return (
     <div className="max-w-8xl mx-auto w-full space-y-8 p-8">
+      {/* 趋势图 - 全宽 */}
       <UniversalChart
         title={t('mediaTrend')}
         option={optionsByDay}
-        height="400px"
-        className="shadow-sm"
+        height="300px"
       />
+
+      {/* 两个环形图 - 1:1 */}
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <UniversalChart
+          title={t('storageDistribution')}
+          option={storageOption}
+          height="300px"
+        />
+        <UniversalChart
+          title={t('fileTypeRatio')}
+          option={fileTypeOption}
+          height="300px"
+        />
+      </div>
+
+      {/* 耗时与进度 - 1:1 */}
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <UniversalChart
+          title={t('processDuration')}
+          option={durationOption}
+          height="300px"
+        />
+        <UniversalChart
+          title={t('seriesProgress')}
+          option={seriesProgressOption}
+          height="300px"
+        />
+      </div>
     </div>
   )
 }
