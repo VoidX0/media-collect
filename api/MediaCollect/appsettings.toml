@@ -24,12 +24,12 @@ AccessExpiration = 24 # 访问令牌过期时间(小时)
 
 # OIDC配置
 [OidcOptions]
-RedirectUri = "" # 重定向到后端的地址
+RedirectUri = "http://127.0.0.1:8080" # 重定向到后端的地址
 ClientId = "" # 客户端ID
 ClientSecret = "" # 客户端密钥
-AuthorizationEndpoint = "" # 授权端点
-TokenEndpoint = "" # 令牌端点
-UserInfoEndpoint = "" # 用户信息端点
+AuthorizationEndpoint = "http://10.168.1.2:9000/application/o/authorize/" # 授权端点
+TokenEndpoint = "http://10.168.1.2:9000/application/o/token/" # 令牌端点
+UserInfoEndpoint = "http://10.168.1.2:9000/application/o/userinfo/" # 用户信息端点
 
 # 连接配置
 [ConnectionOptions]
@@ -56,11 +56,11 @@ TimeoutSeconds = 600 # 超时时间(秒)
 
 # WebDAV配置
 [WebDavOptions]
-Uri = "" # 服务器地址
+Uri = "http://127.0.0.1:5244" # 服务器地址
 Username = "" # 用户名
 Password = "" # 密码
-MediaDirectory = "" # 媒体原存储目录(webdav)
-SaveDirectory = "" # 媒体保存目录(本地，基于/media)
+MediaDirectory = "/dav/夸克/夸克自动转存" # 媒体原存储目录(webdav)
+SaveDirectory = "动漫" # 媒体保存目录(本地，基于/media)
 
 # Sonarr配置
 [SonarrOptions]
@@ -69,4 +69,7 @@ ApiKey = "" # Sonarr API密钥
 
 # 字幕配置
 [SubtitleOptions]
+ConcurrentCount = 5 # 并发处理数量
 CronMergeSubtitle = "0 30 16 * * *" # 执行合并字幕任务的时间
+MovieDirectory = ["电影"] # 电影存放目录
+SeriesDirectory = ["剧集", "动漫"] # 剧集存放目录

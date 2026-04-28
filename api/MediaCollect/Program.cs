@@ -37,6 +37,7 @@ builder.Services.AddSingleton<AiService>(); // AI服务
 builder.Services.AddSingleton<ScheduledJob>(); // 定时任务
 builder.Services.AddSingleton<WebDavService>(); // WebDav服务
 builder.Services.AddSingleton<SonarrService>(); // Sonarr服务
+builder.Services.AddSingleton<SubtitleMergeService>(); // 字幕合并服务
 
 // 构建App
 var app = builder.Build();
