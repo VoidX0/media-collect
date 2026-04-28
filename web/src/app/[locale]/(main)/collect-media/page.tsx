@@ -1,11 +1,12 @@
 'use client'
 
 import { DownloadTask } from '@/api/generatedSchemas'
+import History from '@/components/collect-media/history'
 import Pending from '@/components/collect-media/pending'
 import TaskGroup from '@/components/collect-media/task-group'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { openapi } from '@/lib/http'
-import { LayoutList, ListChecks, ListTodo } from 'lucide-react'
+import { History as HistoryIcon, LayoutList, ListChecks, ListTodo } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -56,7 +57,7 @@ export default function Page() {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList>
+        <TabsList className="flex h-auto w-full justify-start overflow-x-auto overflow-y-hidden bg-transparent p-1 whitespace-nowrap">
           <TabsTrigger value="pending" className="flex items-center gap-2">
             <LayoutList className="h-4 w-4" /> {t('pending')}
           </TabsTrigger>
@@ -67,6 +68,9 @@ export default function Page() {
           <TabsTrigger value="completed" className="flex items-center gap-2">
             <ListChecks className="h-4 w-4" /> {t('completed')}(
             {completedTasks?.length})
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <HistoryIcon className="h-4 w-4" /> {t('history')}
           </TabsTrigger>
         </TabsList>
 
@@ -80,6 +84,10 @@ export default function Page() {
 
         <TabsContent value="completed">
           <TaskGroup tasks={completedTasks} />
+        </TabsContent>
+
+        <TabsContent value="history">
+          <History />
         </TabsContent>
       </Tabs>
     </div>

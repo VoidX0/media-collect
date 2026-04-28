@@ -176,7 +176,7 @@
     "pending": "待处理",
     "processing": "处理中",
     "completed": "已完成",
-    "noPendingMedia": "暂无待处理的媒体",
+    "history": "历史记录",
     "noMedia": "暂无媒体",
     "selectEpisodeAndType": "请选择剧集和媒体类型",
     "addCompleteTaskSuccess": "已成功标记为完成",
@@ -185,7 +185,14 @@
     "taskStatus2": "下载中",
     "taskStatus3": "Sonarr处理中",
     "taskStatus4": "已完成",
-    "taskStatus5": "下载失败"
+    "taskStatus5": "下载失败",
+    "labelEpisode": "剧集",
+    "labelType": "文件类型",
+    "labelSize": "文件大小",
+    "labelElapsed": "耗时",
+    "labelStart": "开始时间",
+    "labelEnd": "结束时间",
+    "redoMediaSuccess": "已成功移除媒体记录"
   },
   "MessageCode": {
     "Unauthorized": "无权限访问",

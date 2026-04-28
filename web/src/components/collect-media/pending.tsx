@@ -175,7 +175,7 @@ export default function Pending() {
         // 无待处理媒体时显示
         <div className="bg-muted flex flex-col items-center justify-center space-y-2 rounded-md border p-8">
           <Search className="text-muted-foreground h-8 w-8" />
-          <p className="text-muted-foreground text-sm">{t('noPendingMedia')}</p>
+          <p className="text-muted-foreground text-sm">{t('noMedia')}</p>
         </div>
       ) : (
         <Accordion

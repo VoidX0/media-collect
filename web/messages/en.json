@@ -176,7 +176,7 @@
     "pending": "Pending",
     "processing": "Processing",
     "completed": "Completed",
-    "noPendingMedia": "No pending media",
+    "history": "History",
     "noMedia": "No media found",
     "selectEpisodeAndType": "Please select episode and media type",
     "addCompleteTaskSuccess": "Marked as completed successfully",
@@ -185,7 +185,14 @@
     "taskStatus2": "Downloading",
     "taskStatus3": "Processing with Sonarr",
     "taskStatus4": "Completed",
-    "taskStatus5": "Download Failed"
+    "taskStatus5": "Download Failed",
+    "labelEpisode": "Episode",
+    "labelType": "File Type",
+    "labelSize": "File Size",
+    "labelElapsed": "Elapsed Time",
+    "labelStart": "Start Time",
+    "labelEnd": "End Time",
+    "redoMediaSuccess": "Media record removed successfully"
   },
   "MessageCode": {
     "Unauthorized": "Unauthorized access",
