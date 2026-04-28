@@ -1,5 +1,7 @@
-﻿using MediaCollect.Core.Models.Common;
+﻿using System.Diagnostics;
+using MediaCollect.Core.Models.Common;
 using MediaCollect.Models.Options;
+using MediaCollect.Utils.Subtitle;
 using Microsoft.Extensions.Options;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -55,14 +57,41 @@ public class SubtitleMergeService
         var videoName = Path.GetFileNameWithoutExtension(videoFile);
         if (string.IsNullOrEmpty(dir) || string.IsNullOrEmpty(videoName))
             return OperateResult.Fail($"无法解析视频文件路径: {videoFile}");
-        // 弹幕文件不存在时跳过
+        // 弹幕文件不存在时跳过 (xxx.danmu.ass)
         var danmuFile = Path.Combine(dir, $"{videoName}{DanmuSuffix}{SubtitleSuffix}");
         if (!File.Exists(danmuFile)) return OperateResult.Success();
-        // 合并文件已存在时跳过
+        // 合并文件已存在时跳过 (xxx.merge.ass)
         var mergeFile = Path.Combine(dir, $"{videoName}{MergeSuffix}{SubtitleSuffix}");
         if (File.Exists(mergeFile)) return OperateResult.Success();
         // 开始处理
-        return OperateResult.Success();
+        _logger.Debug("开始处理视频: {VideoPath}", videoFile);
+        var sw = Stopwatch.StartNew();
+        try
+        {
+            // 1. 查找或提取字幕
+            var subtitlePath = await SubtitleExtractor.GetBestSubtitleAsync(videoFile);
+            if (string.IsNullOrEmpty(subtitlePath) || !File.Exists(subtitlePath))
+            {
+                _logger.Warning("未找到可用字幕，跳过: {VideoPath}", videoFile);
+                return OperateResult.Success();
+            }
+
+            // 2. 格式转换
+            var assPath = Path.GetExtension(subtitlePath).Equals(SubtitleSuffix, StringComparison.OrdinalIgnoreCase)
+                ? subtitlePath
+                : SubtitleConverter.SrtToAss(subtitlePath); // 如果是 SRT，转换为 ASS
+            // 3. 合并文件
+            SubtitleMerger.MergeAssFiles(assPath, danmuFile, mergeFile);
+
+            sw.Stop();
+            _logger.Information("处理完成: {VideoPath} (耗时 {Cost} 秒)", videoFile, Math.Round(sw.Elapsed.TotalSeconds, 2));
+            return OperateResult.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "处理视频字幕合并失败: {VideoPath}", videoFile);
+            return OperateResult.Fail($"处理失败: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -78,7 +107,16 @@ public class SubtitleMergeService
                 var path = Path.Combine(App.MediaPath, dir);
                 if (!Directory.Exists(path)) return [];
                 return Directory.GetFiles(path, "*.*", SearchOption.AllDirectories)
-                    .Where(x => _videoExtension.Contains(Path.GetExtension(x), StringComparer.CurrentCultureIgnoreCase))
+                    .Where(x =>
+                    {
+                        // 检查扩展名
+                        var extMatch = _videoExtension.Contains(Path.GetExtension(x),
+                            StringComparer.CurrentCultureIgnoreCase);
+                        if (!extMatch) return false;
+                        // 如果路径中包含名为 ".ignore" 的文件夹则跳过
+                        var pathParts = x.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                        return !pathParts.Contains(".ignore");
+                    })
                     .ToList();
             }).ToList();
         // 分批处理
@@ -98,11 +136,7 @@ public class SubtitleMergeService
             return batchResult;
         })).ToList();
         // 等待所有批次完成
-        var results = await Task.WhenAll(tasks);
-        var allResults = results.SelectMany(x => x).ToList();
-        var failedResults = allResults.Where(x => !x.IsSuccess).ToList();
-        return failedResults.Count != 0
-            ? OperateResult.Fail(string.Join(Environment.NewLine, failedResults.Select(x => x.Message)))
-            : OperateResult.Success();
+        await Task.WhenAll(tasks);
+        return OperateResult.Success();
     }
 }
