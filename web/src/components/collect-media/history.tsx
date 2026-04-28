@@ -1,4 +1,5 @@
-import { CollectedMedia, QueryDto } from '@/api/generatedSchemas'
+import { CollectedMedia } from '@/api/generatedSchemas'
+import { getMedias, groups } from '@/app/[locale]/(main)/collect-media/media'
 import {
   Accordion,
   AccordionContent,
@@ -14,27 +15,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { formatDateTime } from '@/lib/date-time'
 import { openapi } from '@/lib/http'
 import { Loader, Search, Undo } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-// 根据series分组下载媒体列表
-const groups = (medias: CollectedMedia[]) => {
-  const seriesMap: Record<string, CollectedMedia[]> = {}
-  medias.forEach((t) => {
-    const series = t.series || 'unknown'
-    if (!seriesMap[series]) seriesMap[series] = []
-    seriesMap[series].push(t)
-  })
-  return Object.entries(seriesMap).map(([series, items]) => ({
-    series,
-    items,
-  }))
-}
 
 export default function History() {
   const t = useTranslations('CollectMediaPage')
@@ -44,12 +30,7 @@ export default function History() {
   useEffect(() => {
     const fetch = async () => {
       setLoading(true)
-      const body: QueryDto = {
-        pageNumber: 1,
-        pageSize: 999999999,
-      }
-      const { data } = await openapi.POST('/CollectMedia/Query', { body })
-      setMedias(data?.items)
+      setMedias(await getMedias())
       setLoading(false)
     }
     fetch().then()
@@ -82,7 +63,7 @@ export default function History() {
   }
 
   return (
-    <ScrollArea className="h-[calc(100vh-200px)] pr-4">
+    <div>
       {mediaGroups.length === 0 ? (
         // 无媒体时显示
         <div className="bg-muted flex flex-col items-center justify-center space-y-2 rounded-md border p-8">
@@ -214,6 +195,6 @@ export default function History() {
           })}
         </Accordion>
       )}
-    </ScrollArea>
+    </div>
   )
 }

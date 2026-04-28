@@ -170,7 +170,13 @@
     "noPermissions": "暂无可用权限",
     "saveConfig": "保存配置"
   },
-  "DashboardPage": {},
+  "DashboardPage": {
+    "mediaTrend": "媒体处理趋势",
+    "storageDistribution": "文件存储分布",
+    "fileTypeRatio": "文件类型占比",
+    "processDuration": "处理耗时分析",
+    "seriesProgress": "剧集更新进度"
+  },
   "CollectMediaPage": {
     "loading": "加载中...",
     "pending": "待处理",

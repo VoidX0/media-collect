@@ -170,7 +170,13 @@
     "noPermissions": "No permissions available",
     "saveConfig": "Save Configuration"
   },
-  "DashboardPage": {},
+  "DashboardPage": {
+    "mediaTrend": "Media Processing Trend",
+    "storageDistribution": "Storage Distribution",
+    "fileTypeRatio": "File Type Ratio",
+    "processDuration": "Processing Duration Analysis",
+    "seriesProgress": "Series Update Progress"
+  },
   "CollectMediaPage": {
     "loading": "Loading...",
     "pending": "Pending",

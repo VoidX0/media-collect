@@ -35,7 +35,9 @@ export default function MainLayout({
             </div>
           </div>
         </header>
-        {authorized === true && children}
+        {authorized === true && (
+          <main className="h-full flex-1 overflow-auto">{children}</main>
+        )}
       </SidebarInset>
     </AppSidebarProvider>
   )

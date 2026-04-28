@@ -1,11 +1,39 @@
-import { CollectedMedia, PendingSeries, SonarrEpisode } from '@/api/generatedSchemas'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import {
+  CollectedMedia,
+  PendingSeries,
+  SonarrEpisode,
+} from '@/api/generatedSchemas'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { openapi } from '@/lib/http'
-import { CircleCheck, Download, FileVideo, HardDrive, Loader, Search } from 'lucide-react'
+import {
+  CircleCheck,
+  Download,
+  FileVideo,
+  HardDrive,
+  Loader,
+  Search,
+} from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -170,7 +198,7 @@ export default function Pending() {
   }
 
   return (
-    <ScrollArea className="h-[calc(100vh-200px)] pr-4">
+    <div>
       {pendingSeries === undefined || pendingSeries.length === 0 ? (
         // 无待处理媒体时显示
         <div className="bg-muted flex flex-col items-center justify-center space-y-2 rounded-md border p-8">
@@ -343,6 +371,6 @@ export default function Pending() {
           })}
         </Accordion>
       )}
-    </ScrollArea>
+    </div>
   )
 }
