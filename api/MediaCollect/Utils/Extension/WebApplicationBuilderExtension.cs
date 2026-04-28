@@ -86,6 +86,7 @@ public static class WebApplicationBuilderExtension
             builder.Services.Configure<AiOptions>(builder.Configuration.GetSection(nameof(AiOptions)));
             builder.Services.Configure<WebDavOptions>(builder.Configuration.GetSection(nameof(WebDavOptions)));
             builder.Services.Configure<SonarrOptions>(builder.Configuration.GetSection(nameof(SonarrOptions)));
+            builder.Services.Configure<SubtitleOptions>(builder.Configuration.GetSection(nameof(SubtitleOptions)));
         }
 
         /// <summary>

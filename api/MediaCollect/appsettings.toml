@@ -65,3 +65,7 @@ MediaDirectory = "" # 媒体存储目录
 [SonarrOptions]
 BaseUrl = "" # Sonarr地址
 ApiKey = "" # Sonarr API密钥
+
+# 字幕配置
+[SubtitleOptions]
+CronMergeSubtitle = "0 30 16 * * *" # 执行合并字幕任务的时间
