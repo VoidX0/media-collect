@@ -159,7 +159,7 @@ export const LogoIcon: React.FC<Props> = ({
         x="360"
         y="250"
         transform="scale(1.2)"
-        transformOrigin="360 250"
+        transform-origin="360 250"
         fill="url(#sparkle-grad)"
         filter="url(#glow)"
       />
@@ -168,7 +168,7 @@ export const LogoIcon: React.FC<Props> = ({
         x="140"
         y="160"
         transform="scale(0.9)"
-        transformOrigin="140 160"
+        transform-origin="140 160"
         fill="#00F2FE"
         filter="url(#glow)"
       />
@@ -177,7 +177,7 @@ export const LogoIcon: React.FC<Props> = ({
         x="340"
         y="130"
         transform="scale(0.7)"
-        transformOrigin="340 130"
+        transform-origin="340 130"
         fill="url(#sparkle-grad)"
         opacity="0.9"
       />
