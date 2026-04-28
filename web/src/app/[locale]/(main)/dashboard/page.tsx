@@ -36,7 +36,9 @@ export default function Page() {
   useEffect(() => {
     const fetch = async () => {
       setLoading(true)
-      setMedias(await getMedias())
+      setMedias(
+        (await getMedias()).filter((m) => Number(m.episode?.length) > 0),
+      )
       setLoading(false)
     }
     fetch().then()

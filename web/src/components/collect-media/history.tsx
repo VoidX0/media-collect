@@ -15,7 +15,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { formatDateTime } from '@/lib/date-time'
 import { openapi } from '@/lib/http'
 import { Loader, Search, Undo } from 'lucide-react'
@@ -64,7 +63,7 @@ export default function History() {
   }
 
   return (
-    <ScrollArea className="h-[calc(100vh-200px)] pr-4">
+    <div>
       {mediaGroups.length === 0 ? (
         // 无媒体时显示
         <div className="bg-muted flex flex-col items-center justify-center space-y-2 rounded-md border p-8">
@@ -196,6 +195,6 @@ export default function History() {
           })}
         </Accordion>
       )}
-    </ScrollArea>
+    </div>
   )
 }

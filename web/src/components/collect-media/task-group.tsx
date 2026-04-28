@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/card'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Progress } from '@/components/ui/progress'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { FileVideo, Search } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
@@ -39,7 +38,7 @@ export default function TaskGroup({ tasks }: { tasks: DownloadTask[] }) {
   const currentTasks = useMemo(() => groups(tasks), [tasks])
 
   return (
-    <ScrollArea className="h-[calc(100vh-200px)] pr-4">
+    <div>
       {currentTasks.length === 0 ? (
         // 无媒体时显示
         <div className="bg-muted flex flex-col items-center justify-center space-y-2 rounded-md border p-8">
@@ -126,6 +125,6 @@ export default function TaskGroup({ tasks }: { tasks: DownloadTask[] }) {
           })}
         </Accordion>
       )}
-    </ScrollArea>
+    </div>
   )
 }
