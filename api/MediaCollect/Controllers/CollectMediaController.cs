@@ -233,8 +233,12 @@ public class CollectMediaController : OrmController<CollectedMedia>
             }
 
             // 删除文件
-            var file = new FileInfo(record.SavePath);
-            if (file.Exists) file.Delete();
+            if (!string.IsNullOrWhiteSpace(record.SavePath))
+            {
+                var file = new FileInfo(record.SavePath);
+                if (file.Exists) file.Delete();
+            }
+
             // 删除记录
             await Db.Deleteable(record).ExecuteCommandAsync();
         }
