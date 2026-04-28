@@ -19,7 +19,7 @@ const COMMON_CHART_CONFIG = {
     left: '3%',
     right: '3%',
     top: '10%',
-    bottom: '15%',
+    bottom: '10%',
     containLabel: true,
   },
   legend: {
@@ -95,7 +95,7 @@ export default function Page() {
       dataset: { source: datasetSource },
       xAxis: { type: 'time', boundaryGap: false },
       yAxis: { type: 'value' },
-      dataZoom: [{ type: 'inside' }, { type: 'slider' }],
+      dataZoom: [{ type: 'inside' }],
       series: seriesList.map((name) => ({
         type: 'line',
         name,
@@ -190,6 +190,7 @@ export default function Page() {
       },
       xAxis: { type: 'time' },
       yAxis: { type: 'value', name: 'Seconds' },
+      dataZoom: [{ type: 'inside' }],
       series: [
         { type: 'scatter', symbolSize: 8, data, itemStyle: { opacity: 0.6 } },
       ],
