@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
     // proxyClientMaxBodySize: '15mb', // body最大限制
   },
   // 开发环境origin
-  allowedDevOrigins: ['10.168.1.*', '192.168.*.*'],
+  allowedDevOrigins: ['10.168.1.*'],
 }
 
 export default withNextIntl(nextConfig)
