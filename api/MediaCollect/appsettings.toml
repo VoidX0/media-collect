@@ -69,6 +69,7 @@ ApiKey = "" # Sonarr API密钥
 
 # 字幕配置
 [SubtitleOptions]
+ConcurrentCount = 5 # 并发处理数量
 CronMergeSubtitle = "0 30 16 * * *" # 执行合并字幕任务的时间
 MovieDirectory = ["电影"] # 电影存放目录
 SeriesDirectory = ["剧集", "动漫"] # 剧集存放目录

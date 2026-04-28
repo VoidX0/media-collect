@@ -55,9 +55,28 @@ public class DownloadTask
 /// </summary>
 public enum TaskStatus
 {
+    /// <summary>
+    /// 待处理
+    /// </summary>
     [Description("待处理")] Pending = 1,
+
+    /// <summary>
+    /// 下载中
+    /// </summary>
     [Description("下载中")] Downloading = 2,
+
+    /// <summary>
+    /// Sonarr处理中
+    /// </summary>
     [Description("Sonarr处理中")] Processing = 3,
+
+    /// <summary>
+    /// 已完成
+    /// </summary>
     [Description("已完成")] Completed = 4,
+
+    /// <summary>
+    /// 下载失败
+    /// </summary>
     [Description("下载失败")] Failed = 5,
 }
