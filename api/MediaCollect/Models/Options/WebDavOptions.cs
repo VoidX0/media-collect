@@ -21,7 +21,12 @@ public class WebDavOptions
     public string Password { get; set; } = string.Empty;
 
     /// <summary>
-    /// 媒体存储目录
+    /// 媒体原存储目录(webdav)
     /// </summary>
     public string MediaDirectory { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 媒体保存目录(本地，基于/media)
+    /// </summary>
+    public string SaveDirectory { get; set; } = string.Empty;
 }
