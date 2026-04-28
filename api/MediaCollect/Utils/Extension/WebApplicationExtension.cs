@@ -164,8 +164,10 @@ public static class WebApplicationExtension
         {
             await Task.CompletedTask;
             var logger = Log.ForContext<Program>();
-            if (!Directory.Exists(App.MediaPath)) return;
-            var subDirs = Directory.GetDirectories(App.MediaPath);
+            var dav = app.Services.GetRequiredService<IOptions<WebDavOptions>>().Value;
+            var path = Path.Combine(App.MediaPath, dav.SaveDirectory);
+            if (!Directory.Exists(path)) return;
+            var subDirs = Directory.GetDirectories(path);
             foreach (var subDir in subDirs)
             {
                 var tmpFiles = Directory.GetFiles(subDir, "*.tmp", SearchOption.TopDirectoryOnly);

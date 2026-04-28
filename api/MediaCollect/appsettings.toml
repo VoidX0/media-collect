@@ -59,9 +59,14 @@ TimeoutSeconds = 600 # 超时时间(秒)
 Uri = "" # 服务器地址
 Username = "" # 用户名
 Password = "" # 密码
-MediaDirectory = "" # 媒体存储目录
+MediaDirectory = "" # 媒体原存储目录(webdav)
+SaveDirectory = "" # 媒体保存目录(本地，基于/media)
 
 # Sonarr配置
 [SonarrOptions]
 BaseUrl = "" # Sonarr地址
 ApiKey = "" # Sonarr API密钥
+
+# 字幕配置
+[SubtitleOptions]
+CronMergeSubtitle = "0 30 16 * * *" # 执行合并字幕任务的时间

@@ -3,8 +3,10 @@ using MediaCollect.Controllers.Base;
 using MediaCollect.Core.Models.Common;
 using MediaCollect.Core.Models.Db;
 using MediaCollect.Models;
+using MediaCollect.Models.Options;
 using MediaCollect.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using TaskStatus = MediaCollect.Models.TaskStatus;
 
 namespace MediaCollect.Controllers;
@@ -19,16 +21,20 @@ public class CollectMediaController : OrmController<CollectedMedia>
 {
     private readonly WebDavService _webDavService;
     private readonly SonarrService _sonarrService;
+    private readonly WebDavOptions _webDavOptions;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="webDavService"></param>
     /// <param name="sonarrService"></param>
-    public CollectMediaController(WebDavService webDavService, SonarrService sonarrService)
+    /// <param name="webDavOptions"></param>
+    public CollectMediaController(WebDavService webDavService, SonarrService sonarrService,
+        IOptions<WebDavOptions> webDavOptions)
     {
         _webDavService = webDavService;
         _sonarrService = sonarrService;
+        _webDavOptions = webDavOptions.Value;
     }
 
     /// <summary>
@@ -104,7 +110,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
             if (await Db.Queryable<CollectedMedia>().AnyAsync(x => x.OriginalPath == media.OriginalPath))
                 return BadRequest(MessageCodeEnum.MediaExists.ToMessageCode(media.OriginalPath));
             // 检查目录是否存在
-            if (!Directory.Exists(Path.Combine(App.MediaPath, media.Series)))
+            if (!Directory.Exists(Path.Combine(App.MediaPath, _webDavOptions.SaveDirectory, media.Series)))
                 return BadRequest(MessageCodeEnum.SeriesNotExists.ToMessageCode(media.OriginalPath));
         }
 
@@ -112,7 +118,8 @@ public class CollectMediaController : OrmController<CollectedMedia>
         {
             // 添加下载任务
             App.DownloadTasks.Add(
-                GenerateTask(sonarrSeries.Content ?? [], media, Path.Combine(App.MediaPath, media.Series)));
+                GenerateTask(sonarrSeries.Content ?? [], media,
+                    Path.Combine(App.MediaPath, _webDavOptions.SaveDirectory, media.Series)));
         }
 
         return Ok();
