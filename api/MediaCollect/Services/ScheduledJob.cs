@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using System.Diagnostics;
+using Hangfire;
 using MediaCollect.Models.Options;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -20,18 +21,38 @@ public class ScheduledJob
     /// </summary>
     private ILogger Logger { get; } = Log.ForContext<ScheduledJob>();
 
-    /// <summary>
-    /// 系统选项
-    /// </summary>
-    private SystemOptions SystemOptions { get; }
+    private readonly SubtitleMergeService _subtitleMergeService;
 
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="recurringJob">定时任务管理器</param>
-    /// <param name="systemOptions">系统选项</param>
-    public ScheduledJob(IRecurringJobManager recurringJob, IOptions<SystemOptions> systemOptions)
+    /// <param name="subtitleOptions">字幕选项</param>
+    /// <param name="subtitleMergeService">字幕合并服务</param>
+    public ScheduledJob(IRecurringJobManager recurringJob,
+        IOptions<SubtitleOptions> subtitleOptions, SubtitleMergeService subtitleMergeService)
     {
-        SystemOptions = systemOptions.Value;
+        _subtitleMergeService = subtitleMergeService;
+        recurringJob.AddOrUpdate(
+            "MergeSubtitle",
+            () => MergeSubtitle(),
+            subtitleOptions.Value.CronMergeSubtitle,
+            options: new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+    }
+
+    /// <summary>
+    /// 合并弹幕与字幕
+    /// </summary>
+    public async Task MergeSubtitle()
+    {
+        var watch = Stopwatch.StartNew();
+        var result = await _subtitleMergeService.Run();
+        watch.Stop();
+        if (result.IsSuccess)
+            Logger.Information("合并弹幕与字幕完成, 耗时: {Time}ms", watch.ElapsedMilliseconds);
+        else
+            Logger.Error(result.OperateException,
+                "合并弹幕与字幕失败, 错误信息: {Error}, 耗时: {Time}ms",
+                result.Message, watch.ElapsedMilliseconds);
     }
 }
