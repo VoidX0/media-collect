@@ -72,7 +72,7 @@ public class SubtitleMergeService
             var subtitlePath = await SubtitleExtractor.GetBestSubtitleAsync(videoFile);
             if (string.IsNullOrEmpty(subtitlePath) || !File.Exists(subtitlePath))
             {
-                _logger.Warning("未找到可用字幕，跳过: {VideoPath}", videoFile);
+                _logger.Debug("未找到可用字幕，跳过: {VideoPath}", videoFile);
                 return OperateResult.Success();
             }
 
