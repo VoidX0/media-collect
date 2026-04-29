@@ -59,8 +59,8 @@ public static class SubtitleExtractor
         var dir = Path.GetDirectoryName(videoPath);
         var fileName = Path.GetFileNameWithoutExtension(videoPath);
         if (string.IsNullOrEmpty(dir)) return null;
-        // 优先查找本地已有字幕文件
-        string[] searchSuffixes = [".zh.ass", ".zh.srt", ".hi.ass", ".hi.srt"];
+        // 优先查找本地已有字幕文件(优先ass)
+        string[] searchSuffixes = [".zh.ass", ".hi.ass", ".zh.srt", ".hi.srt"];
         foreach (var suffix in searchSuffixes)
         {
             var path = Path.Combine(dir, fileName + suffix);
