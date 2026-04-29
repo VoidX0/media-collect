@@ -75,6 +75,7 @@
     "appMark": "Media Collect",
     "navDashboard": "概览",
     "navCollectMedia": "媒体转存",
+    "navCleanup": "文件清理",
     "navAuthentication": "权限管理",
     "account": "账户",
     "notifications": "通知",
@@ -200,6 +201,7 @@
     "labelEnd": "结束时间",
     "redoMediaSuccess": "已成功移除媒体记录"
   },
+  "CleanupPage": {},
   "MessageCode": {
     "Unauthorized": "无权限访问",
     "FileEmpty": "文件不能为空",

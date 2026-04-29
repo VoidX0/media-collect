@@ -75,6 +75,7 @@
     "appMark": "Media Collect",
     "navDashboard": "Dashboard",
     "navCollectMedia": "Media Collect",
+    "navCleanup": "File Cleanup",
     "navAuthentication": "Permission Manage",
     "account": "Account",
     "notifications": "Notifications",
@@ -200,6 +201,7 @@
     "labelEnd": "End Time",
     "redoMediaSuccess": "Media record removed successfully"
   },
+  "CleanupPage": {},
   "MessageCode": {
     "Unauthorized": "Unauthorized access",
     "FileEmpty": "File cannot be empty",
