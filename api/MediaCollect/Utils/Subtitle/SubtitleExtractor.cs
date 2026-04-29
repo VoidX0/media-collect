@@ -95,7 +95,12 @@ public static class SubtitleExtractor
                 // 忽略图形字幕 (PGS/DVD等)，因为无法直接做文本检测
                 if (stream.Codec.Contains("pgs", StringComparison.OrdinalIgnoreCase) ||
                     stream.Codec.Contains("dvd", StringComparison.OrdinalIgnoreCase))
+                {
+                    Logger.Debug("[SubtitleExtractor] 跳过 {Video} 图形字幕流 {Index} 语言={Lang} 编解码={Codec}", videoPath,
+                        stream.Index, lang, stream.Codec);
                     continue;
+                }
+
                 var tmpPath = Path.Combine(TmpDir, $"sub_{Guid.NewGuid()}_{stream.Index}.srt");
                 // 提取流并保存为 SRT
                 await FFmpeg.Conversions.New()
@@ -106,7 +111,8 @@ public static class SubtitleExtractor
                 // 读取文件样本进行语言类型检测
                 var sample = await ReadFileSampleAsync(tmpPath);
                 var type = DetectType(sample);
-                Logger.Information("[SubtitleExtractor] 流 {Index} 语种={Lang} 检测类型={Type}", stream.Index, lang, type);
+                Logger.Information("[SubtitleExtractor] 视频 {Video} 流 {Index} 语种={Lang} 检测类型={Type}", videoPath,
+                    stream.Index, lang, type);
                 candidates.Add((type, tmpPath));
             }
 
