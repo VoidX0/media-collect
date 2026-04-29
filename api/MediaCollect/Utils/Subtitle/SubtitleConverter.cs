@@ -33,7 +33,7 @@ public static class SubtitleConverter
         assContent.AppendLine(
             "Format: Name,Fontname,Fontsize,PrimaryColour,SecondaryColour,OutlineColour,BackColour,Bold,Italic,Underline,StrikeOut,ScaleX,ScaleY,Spacing,Angle,BorderStyle,Outline,Shadow,Alignment,MarginL,MarginR,MarginV,Encoding");
         assContent.AppendLine(
-            "Style: Default,Arial,60,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2,0,2,10,10,40,1");
+            "Style: Default,Arial,60,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,0,0,1,2,0,2,10,10,40,0");
         assContent.AppendLine("");
 
         // 写入事件部分 (Events)
@@ -81,7 +81,7 @@ public static class SubtitleConverter
             }
         }
 
-        File.WriteAllText(outputPath, assContent.ToString(), Encoding.UTF8);
+        File.WriteAllText(outputPath, assContent.ToString(), new UTF8Encoding(false));
         return outputPath;
     }
 
@@ -105,7 +105,7 @@ public static class SubtitleConverter
                 var content = reader.ReadToEnd();
 
                 // 简单的解码校验：如果包含非法字符（通常是乱码），则尝试下一个
-                if (content.Contains("") && encName == "utf-8") continue;
+                if (content.Contains("\uFFFD") && encName == "utf-8") continue;
 
                 return content.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
             }
