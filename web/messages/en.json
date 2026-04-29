@@ -201,7 +201,9 @@
     "labelEnd": "End Time",
     "redoMediaSuccess": "Media record removed successfully"
   },
-  "CleanupPage": {},
+  "CleanupPage": {
+    "deleteSeriesTrashSuccess": "Series trash files deleted successfully"
+  },
   "MessageCode": {
     "Unauthorized": "Unauthorized access",
     "FileEmpty": "File cannot be empty",

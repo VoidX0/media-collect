@@ -201,7 +201,9 @@
     "labelEnd": "结束时间",
     "redoMediaSuccess": "已成功移除媒体记录"
   },
-  "CleanupPage": {},
+  "CleanupPage": {
+    "deleteSeriesTrashSuccess": "已成功删除剧集垃圾文件"
+  },
   "MessageCode": {
     "Unauthorized": "无权限访问",
     "FileEmpty": "文件不能为空",
