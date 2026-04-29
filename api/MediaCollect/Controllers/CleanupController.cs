@@ -63,11 +63,13 @@ public class CleanupController : ControllerBase
             {
                 var otherBaseName = Path.GetFileNameWithoutExtension(otherFile);
                 // 判定逻辑:
-                // 情况 A：文件名完全等于视频名 (例如: S01E02.nfo == S01E02)
-                // 情况 B：文件名是 视频名 + 语言后缀 (例如: S01E02.zh-CN.srt)
+                // 情况 A：文件名完全等于视频名
+                // 情况 B：文件名是 视频名.
+                // 情况 C：文件名是 视频名-
                 var isSafe = videoBaseNames.Any(v =>
                     otherBaseName.Equals(v, StringComparison.OrdinalIgnoreCase) ||
-                    otherBaseName.StartsWith(v + ".", StringComparison.OrdinalIgnoreCase)
+                    otherBaseName.StartsWith(v + ".", StringComparison.OrdinalIgnoreCase) ||
+                    otherBaseName.StartsWith(v + "-", StringComparison.OrdinalIgnoreCase)
                 );
                 if (!isSafe) trashFiles.Add(otherFile);
             }
