@@ -75,6 +75,7 @@
     "appMark": "Media Collect",
     "navDashboard": "Dashboard",
     "navCollectMedia": "Media Collect",
+    "navCleanup": "File Cleanup",
     "navAuthentication": "Permission Manage",
     "account": "Account",
     "notifications": "Notifications",
@@ -199,6 +200,9 @@
     "labelStart": "Start Time",
     "labelEnd": "End Time",
     "redoMediaSuccess": "Media record removed successfully"
+  },
+  "CleanupPage": {
+    "deleteSeriesTrashSuccess": "Series trash files deleted successfully"
   },
   "MessageCode": {
     "Unauthorized": "Unauthorized access",

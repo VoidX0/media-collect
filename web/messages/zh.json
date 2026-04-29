@@ -75,6 +75,7 @@
     "appMark": "Media Collect",
     "navDashboard": "概览",
     "navCollectMedia": "媒体转存",
+    "navCleanup": "文件清理",
     "navAuthentication": "权限管理",
     "account": "账户",
     "notifications": "通知",
@@ -199,6 +200,9 @@
     "labelStart": "开始时间",
     "labelEnd": "结束时间",
     "redoMediaSuccess": "已成功移除媒体记录"
+  },
+  "CleanupPage": {
+    "deleteSeriesTrashSuccess": "已成功删除剧集垃圾文件"
   },
   "MessageCode": {
     "Unauthorized": "无权限访问",

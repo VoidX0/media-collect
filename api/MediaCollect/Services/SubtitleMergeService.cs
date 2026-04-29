@@ -28,11 +28,6 @@ public class SubtitleMergeService
     /// </summary>
     private const string MergeSuffix = ".merge";
 
-    /// <summary>
-    /// 视频文件扩展名列表
-    /// </summary>
-    private readonly List<string> _videoExtension = [".mp4", ".mkv", ".avi"];
-
     private readonly ILogger _logger = Log.ForContext<SubtitleMergeService>();
     private readonly SubtitleOptions _subtitleOptions;
 
@@ -110,7 +105,7 @@ public class SubtitleMergeService
                     .Where(x =>
                     {
                         // 检查扩展名
-                        var extMatch = _videoExtension.Contains(Path.GetExtension(x),
+                        var extMatch = App.VideoExtension.Contains(Path.GetExtension(x),
                             StringComparer.CurrentCultureIgnoreCase);
                         if (!extMatch) return false;
                         // 如果路径中包含名为 ".ignore" 的文件夹则跳过

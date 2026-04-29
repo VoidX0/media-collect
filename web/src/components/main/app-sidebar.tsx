@@ -1,6 +1,12 @@
 'use client'
 
-import { Film, LayoutDashboard, type LucideIcon, Shield } from 'lucide-react'
+import {
+  BrushCleaning,
+  Film,
+  LayoutDashboard,
+  type LucideIcon,
+  Shield,
+} from 'lucide-react'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 
@@ -108,6 +114,14 @@ export function AppSidebar({
             data?.find(
               (item) => item.controller === 'CollectMediaController',
             ) === undefined,
+        },
+        {
+          title: t('navCleanup'),
+          url: `/${locale}/cleanup`,
+          icon: BrushCleaning,
+          hidden:
+            data?.find((item) => item.controller === 'CleanupController') ===
+            undefined,
         },
         {
           title: t('navAuthentication'),

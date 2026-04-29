@@ -82,6 +82,11 @@ namespace MediaCollect
         public static IServiceProvider? Services { get; private set; }
 
         /// <summary>
+        /// 视频文件后缀列表
+        /// </summary>
+        public static readonly List<string> VideoExtension = [".mp4", ".mkv", ".avi", ".mov", ".flv"];
+
+        /// <summary>
         /// 本地挂载媒体目录
         /// </summary>
         public static string MediaPath => Path.Combine("/media");
