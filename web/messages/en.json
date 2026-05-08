@@ -202,6 +202,9 @@
     "redoMediaSuccess": "Media record removed successfully"
   },
   "CleanupPage": {
+    "seriesTrash": "Series Trash",
+    "seriesSubtitleTrash": "Series Subtitle Trash",
+    "mergeSubtitle": "Merged Subtitle with Danmaku",
     "deleteSeriesTrashSuccess": "Series trash files deleted successfully",
     "deleteSeriesSubtitleTrashSuccess": "Series subtitle trash files deleted successfully"
   },

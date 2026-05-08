@@ -202,6 +202,9 @@
     "redoMediaSuccess": "已成功移除媒体记录"
   },
   "CleanupPage": {
+    "seriesTrash": "剧集垃圾",
+    "seriesSubtitleTrash": "剧集字幕垃圾",
+    "mergeSubtitle": "已合并弹幕的字幕",
     "deleteSeriesTrashSuccess": "已成功删除剧集垃圾文件",
     "deleteSeriesSubtitleTrashSuccess": "已成功删除剧集字幕垃圾文件"
   },

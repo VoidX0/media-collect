@@ -72,13 +72,14 @@ export default function Page() {
       <Tabs className="space-y-4" defaultValue="seriesTrash">
         <TabsList className="flex h-auto w-full justify-start overflow-x-auto overflow-y-hidden bg-transparent p-1 whitespace-nowrap">
           <TabsTrigger value="seriesTrash" className="flex items-center gap-2">
-            <FilePlay className="h-4 w-4" /> Series Trash ({seriesTrash.length})
+            <FilePlay className="h-4 w-4" /> {t('seriesTrash')} (
+            {seriesTrash.length})
           </TabsTrigger>
           <TabsTrigger
             value="seriesSubtitleTrash"
             className="flex items-center gap-2"
           >
-            <FileSpreadsheet className="h-4 w-4" /> Series Subtitle Trash (
+            <FileSpreadsheet className="h-4 w-4" /> {t('seriesSubtitleTrash')} (
             {seriesSubtitleTrash.length})
           </TabsTrigger>
           <TabsTrigger
@@ -86,7 +87,7 @@ export default function Page() {
             className="flex items-center gap-2"
             disabled={mergeSubtitle.length === 0}
           >
-            <FileStack className="h-4 w-4" /> Merge Subtitle (
+            <FileStack className="h-4 w-4" /> {t('mergeSubtitle')} (
             {mergeSubtitle.length})
           </TabsTrigger>
         </TabsList>
