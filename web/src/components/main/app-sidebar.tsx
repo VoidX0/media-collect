@@ -5,6 +5,7 @@ import {
   Film,
   LayoutDashboard,
   type LucideIcon,
+  PencilLine,
   Shield,
 } from 'lucide-react'
 import * as React from 'react'
@@ -114,6 +115,14 @@ export function AppSidebar({
             data?.find(
               (item) => item.controller === 'CollectMediaController',
             ) === undefined,
+        },
+        {
+          title: t('navRename'),
+          url: `/${locale}/rename`,
+          icon: PencilLine,
+          hidden:
+            data?.find((item) => item.controller === 'RenameController') ===
+            undefined,
         },
         {
           title: t('navCleanup'),

@@ -76,6 +76,7 @@
     "navDashboard": "Dashboard",
     "navCollectMedia": "Media Collect",
     "navCleanup": "File Cleanup",
+    "navRename": "File Rename",
     "navAuthentication": "Permission Manage",
     "account": "Account",
     "notifications": "Notifications",
@@ -200,6 +201,20 @@
     "labelStart": "Start Time",
     "labelEnd": "End Time",
     "redoMediaSuccess": "Media record removed successfully"
+  },
+  "RenamePage": {
+    "targetDir": "Target Directory",
+    "regex": "Regex Pattern",
+    "regexHelp": "Common examples: Exx: [Ee](\\d+)  SxxExx: [Ss]\\d+[Ee](\\d+)",
+    "template": "Filename Template (use ep for episode number)",
+    "extensions": "Extensions (comma separated)",
+    "offset": "Offset",
+    "padding": "Padding",
+    "preview": "Preview",
+    "execute": "Execute",
+    "noData": "Please enter a path and preview",
+    "noResult": "No matching files found",
+    "errorPreview": "Failed to fetch preview"
   },
   "CleanupPage": {
     "seriesTrash": "Series Trash",
