@@ -7,6 +7,7 @@ import {
   CheckLine,
   FilePlay,
   FileSpreadsheet,
+  FileStack,
   Loader,
   Trash,
 } from 'lucide-react'
@@ -22,14 +23,20 @@ export default function Page() {
   const [seriesSubtitleTrash, setSeriesSubtitleTrash] = useState<
     string[] | undefined
   >(undefined)
+  const [mergeSubtitle, setMergeSubtitle] = useState<string[] | undefined>(
+    undefined,
+  )
   useEffect(() => {
     const fetch = async () => {
-      const [seriesTrashData, seriesSubtitleTrashData] = await Promise.all([
-        openapi.GET('/Cleanup/SeriesTrash'),
-        openapi.GET('/Cleanup/SeriesSubtitleTrash'),
-      ])
+      const [seriesTrashData, seriesSubtitleTrashData, mergeSubtitle] =
+        await Promise.all([
+          openapi.GET('/Cleanup/SeriesTrash'),
+          openapi.GET('/Cleanup/SeriesSubtitleTrash'),
+          openapi.GET('/Cleanup/MergeSubtitle'),
+        ])
       setSeriesTrash(seriesTrashData.data)
       setSeriesSubtitleTrash(seriesSubtitleTrashData.data)
+      setMergeSubtitle(mergeSubtitle.data)
     }
     fetch().then()
   }, [])
@@ -50,7 +57,7 @@ export default function Page() {
     }
   }
 
-  if (!seriesTrash || !seriesSubtitleTrash) {
+  if (!seriesTrash || !seriesSubtitleTrash || !mergeSubtitle) {
     return (
       <div className="max-w-8xl mx-auto w-full space-y-8 p-8">
         <div className="bg-muted flex animate-pulse flex-col items-center justify-center space-y-2 rounded-md border p-8">
@@ -73,6 +80,14 @@ export default function Page() {
           >
             <FileSpreadsheet className="h-4 w-4" /> Series Subtitle Trash (
             {seriesSubtitleTrash.length})
+          </TabsTrigger>
+          <TabsTrigger
+            value="mergeSubtitle"
+            className="flex items-center gap-2"
+            disabled={mergeSubtitle.length === 0}
+          >
+            <FileStack className="h-4 w-4" /> Merge Subtitle (
+            {mergeSubtitle.length})
           </TabsTrigger>
         </TabsList>
 
@@ -116,6 +131,22 @@ export default function Page() {
           ) : (
             <div className="space-y-4">
               {seriesSubtitleTrash.map((subtitle) => (
+                <div key={subtitle} className="bg-muted rounded-md border p-4">
+                  <p className="text-sm">{subtitle}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="mergeSubtitle" className="space-y-4">
+          {mergeSubtitle.length === 0 ? (
+            <div className="bg-muted flex flex-col items-center justify-center space-y-2 rounded-md border p-8">
+              <CheckLine className="text-muted-foreground h-8 w-8" />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {mergeSubtitle.map((subtitle) => (
                 <div key={subtitle} className="bg-muted rounded-md border p-4">
                   <p className="text-sm">{subtitle}</p>
                 </div>
