@@ -22,6 +22,7 @@ export default function Page() {
     extensions: 'mp4,mkv,avi',
   })
   const [preview, setPreview] = useState<RenamePreview[] | null>(null)
+  const [isPreviewed, setIsPreviewed] = useState(false)
 
   // 获取重命名预览
   const handlePreview = async () => {
@@ -41,6 +42,7 @@ export default function Page() {
       return
     }
     setPreview(data || [])
+    setIsPreviewed(true) // 标记已预览
   }
 
   // 执行重命名
@@ -56,6 +58,7 @@ export default function Page() {
     })
 
     if (error) return
+    setIsPreviewed(false) // 执行完后重置预览状态
     await handlePreview()
   }
 
@@ -67,9 +70,10 @@ export default function Page() {
           <Label>{t('targetDir')}</Label>
           <Input
             value={config.targetDir}
-            onChange={(e) =>
+            onChange={(e) => {
               setConfig({ ...config, targetDir: e.target.value })
-            }
+              setIsPreviewed(false) // 路径改变时重置
+            }}
           />
         </div>
         <div className="space-y-2">
@@ -121,7 +125,7 @@ export default function Page() {
           <Button
             onClick={handleExecute}
             variant="secondary"
-            disabled={!preview || preview.length === 0}
+            disabled={!preview || preview.length === 0 || !isPreviewed}
           >
             {t('execute')}
           </Button>
