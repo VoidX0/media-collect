@@ -202,7 +202,8 @@
     "redoMediaSuccess": "已成功移除媒体记录"
   },
   "CleanupPage": {
-    "deleteSeriesTrashSuccess": "已成功删除剧集垃圾文件"
+    "deleteSeriesTrashSuccess": "已成功删除剧集垃圾文件",
+    "deleteSeriesSubtitleTrashSuccess": "已成功删除剧集字幕垃圾文件"
   },
   "MessageCode": {
     "Unauthorized": "无权限访问",

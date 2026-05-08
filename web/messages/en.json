@@ -202,7 +202,8 @@
     "redoMediaSuccess": "Media record removed successfully"
   },
   "CleanupPage": {
-    "deleteSeriesTrashSuccess": "Series trash files deleted successfully"
+    "deleteSeriesTrashSuccess": "Series trash files deleted successfully",
+    "deleteSeriesSubtitleTrashSuccess": "Series subtitle trash files deleted successfully"
   },
   "MessageCode": {
     "Unauthorized": "Unauthorized access",
