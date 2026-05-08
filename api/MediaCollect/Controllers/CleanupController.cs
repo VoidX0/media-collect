@@ -110,6 +110,22 @@ public class CleanupController : ControllerBase
     }
 
     /// <summary>
+    /// 获取已合并的字幕文件
+    /// </summary>
+    /// <returns></returns>
+    private List<string> GetMergeSubtitle()
+    {
+        var paths = _subtitleOptions.MovieDirectory.Concat(_subtitleOptions.SeriesDirectory)
+            .Select(x => Path.Combine(App.MediaPath, x))
+            .Where(Directory.Exists)
+            .ToList();
+        // 找到所有.merge.ass
+        var mergeFiles = paths.SelectMany(x => Directory.GetFiles(x, "*.merge.ass", SearchOption.AllDirectories))
+            .ToList();
+        return mergeFiles.OrderBy(x => x).ToList();
+    }
+
+    /// <summary>
     /// 删除剧集目录垃圾
     /// </summary>
     /// <returns></returns>
@@ -177,5 +193,16 @@ public class CleanupController : ControllerBase
     {
         await Task.CompletedTask;
         return Ok(GetSeriesSubtitleTrash());
+    }
+
+    /// <summary>
+    /// 已合并的字幕文件
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<ActionResult<List<string>>> MergeSubtitle()
+    {
+        await Task.CompletedTask;
+        return Ok(GetMergeSubtitle());
     }
 }
