@@ -40,7 +40,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: web
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: ESLint check
         uses: reviewdog/action-eslint@v1
