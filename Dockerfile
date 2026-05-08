@@ -22,7 +22,11 @@ WORKDIR /app
 COPY ./web/package.json ./web/pnpm-lock.yaml ./
 #RUN corepack enable pnpm && pnpm install --frozen-lockfile
 RUN corepack enable pnpm && \
-    export PNPM_APPROVE_BUILDS=true && \
+    # 1. 设置允许所有脚本执行
+    pnpm config set approve-builds true && \
+    # 2. 针对当前项目批准所有已知的构建脚本
+    # 这一步是关键，它会根据 lockfile 自动批准上述列表中的所有包
+    pnpm approve-builds --force && \
     pnpm install
 # 发布
 FROM base AS web_publish
