@@ -21,7 +21,9 @@ FROM base AS web_build
 WORKDIR /app
 COPY ./web/package.json ./web/pnpm-lock.yaml ./
 #RUN corepack enable pnpm && pnpm install --frozen-lockfile
-RUN corepack enable pnpm && pnpm install
+RUN corepack enable pnpm && \
+    export PNPM_APPROVE_BUILDS=true && \
+    pnpm install
 # 发布
 FROM base AS web_publish
 WORKDIR /app
