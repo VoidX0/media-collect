@@ -19,15 +19,9 @@ FROM node:lts-alpine AS base
 # 依赖
 FROM base AS web_build
 WORKDIR /app
-COPY ./web/package.json ./web/pnpm-lock.yaml ./
+COPY ./web/package.json ./web/pnpm-lock.yaml ./web/pnpm-workspace.yaml ./
 #RUN corepack enable pnpm && pnpm install --frozen-lockfile
-RUN corepack enable pnpm && \
-    # 1. 设置允许所有脚本执行
-    pnpm config set approve-builds true && \
-    # 2. 针对当前项目批准所有已知的构建脚本
-    # 这一步是关键，它会根据 lockfile 自动批准上述列表中的所有包
-    pnpm approve-builds --force && \
-    pnpm install
+RUN corepack enable pnpm && pnpm install
 # 发布
 FROM base AS web_publish
 WORKDIR /app
