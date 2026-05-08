@@ -139,6 +139,16 @@ export const schemas = {
       type: 'string | null | undefined',
     },
   },
+  ExecuteRenameRequest: {
+    targetDir: {
+      type: 'string | undefined',
+      description: '目标目录',
+    },
+    items: {
+      type: '{ oldName?: string | undefined; newName?: string | undefined; status?: string | undefined; }[] | undefined',
+      description: '需要重命名的文件列表',
+    },
+  },
   IFormFile: {},
   MessageCode: {
     codeIndex: {
@@ -250,6 +260,48 @@ export const schemas = {
     orderByType: {
       type: 'number | undefined',
       description: '排序类型',
+    },
+  },
+  RenamePreview: {
+    oldName: {
+      type: 'string | undefined',
+      description: '原文件名',
+    },
+    newName: {
+      type: 'string | undefined',
+      description: '新文件名',
+    },
+    status: {
+      type: 'string | undefined',
+      description: '状态',
+    },
+  },
+  RenameRequest: {
+    targetDir: {
+      type: 'string | undefined',
+      description: '目标目录',
+    },
+    extensions: {
+      type: 'string[] | undefined',
+      description: '需要重命名的文件扩展名列表，例如 [".mp4", ".mkv"]',
+    },
+    regexPattern: {
+      type: 'string | undefined',
+      description: '用于提取剧集信息的正则表达式',
+    },
+    offset: {
+      type: 'string | number | undefined',
+      description: '集数偏移量',
+      format: 'int32',
+    },
+    template: {
+      type: 'string | undefined',
+      description: '重命名模板，使用 {ep} 作为集数占位符，例如 "Anime_E{ep}"',
+    },
+    padding: {
+      type: 'string | number | undefined',
+      description: '集数填充位数，例如 2 表示集数 1 会被填充为 "01"',
+      format: 'int32',
     },
   },
   SchemaAiRequest: {
@@ -428,6 +480,7 @@ export type CustomConditionalType =
 export type CustomOrderByType = components['schemas']['CustomOrderByType']
 export type DownloadTask = components['schemas']['DownloadTask']
 export type Exception = components['schemas']['Exception']
+export type ExecuteRenameRequest = components['schemas']['ExecuteRenameRequest']
 export type IFormFile = components['schemas']['IFormFile']
 export type MessageCode = components['schemas']['MessageCode']
 export type MessageCodeEnum = components['schemas']['MessageCodeEnum']
@@ -438,6 +491,8 @@ export type PendingSeries = components['schemas']['PendingSeries']
 export type QueryCondition = components['schemas']['QueryCondition']
 export type QueryDto = components['schemas']['QueryDto']
 export type QueryOrder = components['schemas']['QueryOrder']
+export type RenamePreview = components['schemas']['RenamePreview']
+export type RenameRequest = components['schemas']['RenameRequest']
 export type SchemaAiRequest = components['schemas']['SchemaAiRequest']
 export type SchemaField = components['schemas']['SchemaField']
 export type SchemaInfo = components['schemas']['SchemaInfo']
