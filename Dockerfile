@@ -20,8 +20,7 @@ FROM node:lts-alpine AS base
 FROM base AS web_build
 WORKDIR /app
 COPY ./web/package.json ./web/pnpm-lock.yaml ./web/pnpm-workspace.yaml ./
-#RUN corepack enable pnpm && pnpm install --frozen-lockfile
-RUN corepack enable pnpm && pnpm install
+RUN corepack enable pnpm && pnpm install --frozen-lockfile
 # 发布
 FROM base AS web_publish
 WORKDIR /app
