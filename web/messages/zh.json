@@ -177,7 +177,10 @@
     "storageDistribution": "文件存储分布",
     "fileTypeRatio": "文件类型占比",
     "processDuration": "处理耗时分析",
-    "seriesProgress": "剧集更新进度"
+    "seriesProgress": "剧集更新进度",
+    "danmuCoverage": "弹幕覆盖率",
+    "haveCoverage": "有弹幕",
+    "noCoverage": "无弹幕"
   },
   "CollectMediaPage": {
     "loading": "加载中...",

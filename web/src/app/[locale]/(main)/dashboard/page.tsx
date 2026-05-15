@@ -6,13 +6,36 @@ import UniversalChart from '@/components/chart/universal-chart'
 import { formatDate } from '@/lib/date-time'
 import { openapi } from '@/lib/http'
 import { EChartsOption } from 'echarts'
-import { BarChart, LineChart, PieChart, ScatterChart } from 'echarts/charts'
+import {
+  BarChart,
+  HeatmapChart,
+  LineChart,
+  PieChart,
+  ScatterChart,
+} from 'echarts/charts'
+import { VisualMapComponent } from 'echarts/components'
 import * as echarts from 'echarts/core'
 import { Loader } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
-echarts.use([LineChart, PieChart, BarChart, ScatterChart])
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel'
+import { resolveColor } from '@/lib/echarts/dynamic-theme'
+
+echarts.use([
+  LineChart,
+  PieChart,
+  BarChart,
+  ScatterChart,
+  HeatmapChart,
+  VisualMapComponent,
+])
 
 /** 提取通用的基础配置 */
 const COMMON_CHART_CONFIG = {
@@ -49,8 +72,6 @@ export default function Page() {
 
       setMedias(mediaRes.filter((m) => Number(m.episode?.length) > 0))
       setDanmuCoverage(coverageRes.data)
-      console.log('Fetched medias:', mediaRes)
-      console.log('Fetched danmu coverage:', coverageRes.data)
       setLoading(false)
     }
     fetch().then()
@@ -237,12 +258,108 @@ export default function Page() {
     } as EChartsOption
   }, [medias])
 
+  // 6. 弹幕覆盖率热力图组
+  const danmuHeatmapOptions = useMemo(() => {
+    if (!danmuCoverage?.length) return []
+
+    return danmuCoverage.map((coverage) => {
+      const { series, seasons } = coverage
+      const allEpisodesSet = new Set<string>()
+      let totalEpisodes = 0
+      let coveredEpisodes = 0
+
+      // 统计数据并收集所有集数（作为X轴）
+      seasons?.forEach((season) => {
+        Object.entries(season.episodeCoverage || {}).forEach(
+          ([ep, hasDanmu]) => {
+            allEpisodesSet.add(ep)
+            totalEpisodes++
+            if (hasDanmu) coveredEpisodes++
+          },
+        )
+      })
+
+      // 对集数进行排序，优先按数字大小排，字母靠后
+      const xAxisData = Array.from(allEpisodesSet).sort((a, b) => {
+        const numA = parseInt(a)
+        const numB = parseInt(b)
+        if (!isNaN(numA) && !isNaN(numB)) return numA - numB
+        return a.localeCompare(b)
+      })
+
+      // Y轴：季的名称
+      const yAxisData = seasons?.map((s) => s.name)
+
+      // 组装热力图数据: [xIndex, yIndex, value (1=true, 0=false)]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const heatmapData: any[] = []
+      seasons?.forEach((season, yIndex) => {
+        Object.entries(season.episodeCoverage || {}).forEach(
+          ([ep, hasDanmu]) => {
+            const xIndex = xAxisData.indexOf(ep)
+            heatmapData.push([xIndex, yIndex, hasDanmu ? 1 : 0])
+          },
+        )
+      })
+
+      // 计算覆盖率
+      const percentage =
+        totalEpisodes === 0
+          ? 0
+          : Math.round((coveredEpisodes / totalEpisodes) * 100)
+      const title = `${series} (${percentage}%)`
+
+      const option: EChartsOption = {
+        ...COMMON_CHART_CONFIG,
+        legend: undefined,
+        tooltip: {
+          position: 'top',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          formatter: (params: any) => {
+            const seasonName = yAxisData![params.value[1]]
+            const episodeName = xAxisData![params.value[0]]
+            const isCovered = params.value[2] === 1
+            return `${seasonName} <br/> ${episodeName}: <b>${isCovered ? t('haveCoverage') : t('noCoverage')}</b>`
+          },
+        },
+        xAxis: {
+          type: 'category',
+          data: xAxisData,
+          splitArea: { show: true },
+        },
+        yAxis: {
+          type: 'category',
+          data: yAxisData,
+          inverse: true,
+        } as unknown as EChartsOption['yAxis'],
+        visualMap: {
+          min: 0,
+          max: 1,
+          calculable: false,
+          show: false, // 隐藏图例
+        },
+        series: [
+          {
+            name: t('danmuCoverage'),
+            type: 'heatmap',
+            data: heatmapData,
+            label: { show: false },
+            itemStyle: {
+              borderColor: resolveColor('--foreground'),
+              borderWidth: 1,
+            },
+          },
+        ],
+      }
+
+      return { title, option }
+    })
+  }, [danmuCoverage, t])
+
   if (loading) {
     return (
-      <div className="max-w-8xl mx-auto w-full space-y-8 p-8">
-        <div className="bg-muted flex animate-pulse flex-col items-center justify-center space-y-2 rounded-md border p-8">
-          <Loader className="text-muted-foreground h-8 w-8" />
-        </div>
+      <div className="flex h-64 items-center justify-center">
+        <Loader className="h-8 w-8 animate-spin" />
       </div>
     )
   }
@@ -283,6 +400,34 @@ export default function Page() {
           height="300px"
         />
       </div>
+
+      {/* 弹幕覆盖率热力图 */}
+      {danmuHeatmapOptions && danmuHeatmapOptions.length > 0 && (
+        <div className="w-full">
+          <Carousel className="w-full px-4 xl:px-12">
+            <CarouselContent>
+              {danmuHeatmapOptions.map((item, index) => (
+                <CarouselItem key={index}>
+                  <UniversalChart
+                    title={t('danmuCoverage')}
+                    description={item.title}
+                    option={item.option}
+                    height="300px"
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+
+            {/* 左右箭头 */}
+            {danmuHeatmapOptions.length > 1 && (
+              <>
+                <CarouselPrevious className="left-0 xl:-left-8" />
+                <CarouselNext className="right-0 xl:-right-8" />
+              </>
+            )}
+          </Carousel>
+        </div>
+      )}
     </div>
   )
 }
