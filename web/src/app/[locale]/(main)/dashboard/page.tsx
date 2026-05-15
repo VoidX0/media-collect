@@ -64,7 +64,7 @@ export default function Page() {
   >()
 
   // 初始化 Autoplay 插件，配置延迟
-  const plugin = useRef(Autoplay({ delay: 4000, stopOnInteraction: true }))
+  const plugin = useRef(Autoplay({ delay: 5000, stopOnInteraction: true }))
 
   // 加载数据
   useEffect(() => {
@@ -334,7 +334,6 @@ export default function Page() {
           ...COMMON_CHART_CONFIG,
           legend: undefined,
           tooltip: {
-            position: 'top',
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             formatter: (params: any) => {
               // params.data 即为我们 push 进去的数组 [x, y, value, title]
@@ -358,6 +357,7 @@ export default function Page() {
           visualMap: {
             min: 0,
             max: 1,
+            dimension: 2, // 根据 heatmapData 中的第3个元素（覆盖状态）进行映射
             calculable: false,
             show: false, // 隐藏图例
           },
