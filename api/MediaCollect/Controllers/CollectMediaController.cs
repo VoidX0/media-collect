@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 using MediaCollect.Controllers.Base;
 using MediaCollect.Core.Models.Common;
@@ -254,7 +254,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
                 // 检查是否有对应的xml,如果有则认为有弹幕
                 var nameWithoutExtension = Path.GetFileNameWithoutExtension(video);
                 var danmuFile = Path.Combine(Path.GetDirectoryName(video) ?? "", nameWithoutExtension + ".xml");
-                // 是否匹配 - S02E01 - 这样的命名方式，如果匹配，代表能解析出季数和集数，否则认为是电影。注意后面的集数可能是两位也可能是三位
+                // 是否匹配 - S02E01 - 这样的命名方式
                 var isMovie = true;
                 var seasonNumber = 0;
                 var episodeNumber = 0;
@@ -266,6 +266,18 @@ public class CollectMediaController : OrmController<CollectedMedia>
                         ? sNumber
                         : 0;
                     episodeNumber = int.TryParse(match.Groups[2].Value, out var eNumber) ? eNumber : 0;
+                }
+
+                // 范围匹配 - S00E01-E09 - 这样的命名方式
+                var matchRange = Regex.Match(nameWithoutExtension, @"- S(\d{2})E(\d{2,3})-E(\d{2,3}) -",
+                    RegexOptions.IgnoreCase);
+                if (matchRange.Success)
+                {
+                    isMovie = false;
+                    seasonNumber = int.TryParse(matchRange.Groups[1].Value, out var sNumber)
+                        ? sNumber
+                        : 0;
+                    episodeNumber = int.TryParse(matchRange.Groups[2].Value, out var eNumber) ? eNumber : 0;
                 }
 
                 // 添加覆盖率信息
@@ -284,6 +296,8 @@ public class CollectMediaController : OrmController<CollectedMedia>
                 result.Add(coverage);
         }
 
+        // 排除没有任何弹幕的剧集
+        result = result.Where(x => x.Episodes.Any(y => y.HaveDanmu)).ToList();
         // 找到到电影分类
         var movieResult = result.Where(x => x.Episodes.All(y => y.IsMovie)).ToList();
         // 排序
@@ -303,7 +317,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
         }
 
         // 合并结果
-        result = seriesResult.Concat(movieResult).ToList();
+        result = movieResult.Concat(seriesResult).ToList();
         return Ok(result);
     }
 
