@@ -89,8 +89,42 @@ export const schemas = {
       description: '集数',
     },
   },
+  CoverageEpisode: {
+    title: {
+      type: 'string | undefined',
+      description: '名称',
+    },
+    season: {
+      type: 'string | number | undefined',
+      description: '季数',
+      format: 'int32',
+    },
+    episode: {
+      type: 'string | number | undefined',
+      description: '集数',
+      format: 'int32',
+    },
+    isMovie: {
+      type: 'boolean | undefined',
+      description: '是否为电影',
+    },
+    haveDanmu: {
+      type: 'boolean | undefined',
+      description: '是否有弹幕',
+    },
+  },
   CustomConditionalType: {},
   CustomOrderByType: {},
+  DanmuCoverage: {
+    series: {
+      type: 'string | undefined',
+      description: '系列',
+    },
+    episodes: {
+      type: '{ title?: string | undefined; season?: string | number | undefined; episode?: string | number | undefined; isMovie?: boolean | undefined; haveDanmu?: boolean | undefined; }[] | undefined',
+      description: '集覆盖率列表',
+    },
+  },
   DownloadTask: {
     media: {
       type: '{ id?: string | number | undefined; startTime?: string | undefined; endTime?: string | null | undefined; originalPath?: string | undefined; savePath?: string | undefined; fileSize?: string | number | undefined; fileType?: string | undefined; series?: string | undefined; episode?: string | undefined; }',
@@ -475,9 +509,11 @@ export const schemas = {
 export type AggregateException = components['schemas']['AggregateException']
 export type ChatMessage = components['schemas']['ChatMessage']
 export type CollectedMedia = components['schemas']['CollectedMedia']
+export type CoverageEpisode = components['schemas']['CoverageEpisode']
 export type CustomConditionalType =
   components['schemas']['CustomConditionalType']
 export type CustomOrderByType = components['schemas']['CustomOrderByType']
+export type DanmuCoverage = components['schemas']['DanmuCoverage']
 export type DownloadTask = components['schemas']['DownloadTask']
 export type Exception = components['schemas']['Exception']
 export type ExecuteRenameRequest = components['schemas']['ExecuteRenameRequest']

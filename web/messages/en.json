@@ -177,7 +177,10 @@
     "storageDistribution": "Storage Distribution",
     "fileTypeRatio": "File Type Ratio",
     "processDuration": "Processing Duration Analysis",
-    "seriesProgress": "Series Update Progress"
+    "seriesProgress": "Series Update Progress",
+    "danmuCoverage": "Danmaku Coverage",
+    "haveCoverage": "With Danmaku",
+    "noCoverage": "Without Danmaku"
   },
   "CollectMediaPage": {
     "loading": "Loading...",

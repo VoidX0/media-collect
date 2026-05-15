@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Text.RegularExpressions;
 using MediaCollect.Controllers.Base;
 using MediaCollect.Core.Models.Common;
 using MediaCollect.Core.Models.Db;
@@ -22,6 +23,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
     private readonly WebDavService _webDavService;
     private readonly SonarrService _sonarrService;
     private readonly WebDavOptions _webDavOptions;
+    private readonly SubtitleOptions _subtitleOptions;
 
     /// <summary>
     /// 构造函数
@@ -29,12 +31,14 @@ public class CollectMediaController : OrmController<CollectedMedia>
     /// <param name="webDavService"></param>
     /// <param name="sonarrService"></param>
     /// <param name="webDavOptions"></param>
+    /// <param name="subtitleOptions"></param>
     public CollectMediaController(WebDavService webDavService, SonarrService sonarrService,
-        IOptions<WebDavOptions> webDavOptions)
+        IOptions<WebDavOptions> webDavOptions, IOptions<SubtitleOptions> subtitleOptions)
     {
         _webDavService = webDavService;
         _sonarrService = sonarrService;
         _webDavOptions = webDavOptions.Value;
+        _subtitleOptions = subtitleOptions.Value;
     }
 
     /// <summary>
@@ -215,6 +219,91 @@ public class CollectMediaController : OrmController<CollectedMedia>
         var result = tasks.Select(x => x.Result)
             .Where(x => x is not null)
             .OrderBy(x => x?.Series.Title).ToList();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// 获取弹幕覆盖率信息
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<ActionResult<List<DanmuCoverage>>> DanmuCoverage()
+    {
+        var result = new List<DanmuCoverage>();
+        // 获取匹配信息
+        var path = _subtitleOptions.SeriesDirectory.Concat(_subtitleOptions.MovieDirectory)
+            .Select(x => Path.Combine(App.MediaPath, x))
+            .Where(Directory.Exists)
+            .ToList();
+        // 获取所有视频文件，按目录分组
+        var videosByDir = path
+            .SelectMany(x => Directory.GetFiles(x, "*.*", SearchOption.AllDirectories)
+                .Where(file =>
+                    App.VideoExtension.Contains(Path.GetExtension(file), StringComparer.CurrentCultureIgnoreCase)))
+            .GroupBy(Path.GetDirectoryName);
+        foreach (var group in videosByDir)
+        {
+            // 解析目录结构
+            var dirParts = group.Key?.Split(Path.DirectorySeparatorChar) ?? [];
+            if (dirParts.Length < 2) continue;
+            var series = dirParts[^2]; // 倒数第二级目录为剧集名称
+            // 计算每个视频文件的弹幕覆盖率
+            var coverage = result.FirstOrDefault(x => x.Series == series) ?? new DanmuCoverage { Series = series };
+            foreach (var video in group)
+            {
+                // 检查是否有对应的xml,如果有则认为有弹幕
+                var nameWithoutExtension = Path.GetFileNameWithoutExtension(video);
+                var danmuFile = Path.Combine(Path.GetDirectoryName(video) ?? "", nameWithoutExtension + ".xml");
+                // 是否匹配 - S02E01 - 这样的命名方式，如果匹配，代表能解析出季数和集数，否则认为是电影。注意后面的集数可能是两位也可能是三位
+                var isMovie = true;
+                var seasonNumber = 0;
+                var episodeNumber = 0;
+                var match = Regex.Match(nameWithoutExtension, @"- S(\d{2})E(\d{2,3}) -", RegexOptions.IgnoreCase);
+                if (match.Success)
+                {
+                    isMovie = false;
+                    seasonNumber = int.TryParse(match.Groups[1].Value, out var sNumber)
+                        ? sNumber
+                        : 0;
+                    episodeNumber = int.TryParse(match.Groups[2].Value, out var eNumber) ? eNumber : 0;
+                }
+
+                // 添加覆盖率信息
+                coverage.Episodes.Add(new CoverageEpisode
+                {
+                    Title = nameWithoutExtension,
+                    Season = seasonNumber,
+                    Episode = episodeNumber,
+                    IsMovie = isMovie,
+                    HaveDanmu = System.IO.File.Exists(danmuFile)
+                });
+            }
+
+            // 添加剧集信息
+            if (result.All(x => x.Series != series))
+                result.Add(coverage);
+        }
+
+        // 找到到电影分类
+        var movieResult = result.Where(x => x.Episodes.All(y => y.IsMovie)).ToList();
+        // 排序
+        movieResult = movieResult.OrderBy(x => x.Series).ToList();
+        foreach (var coverage in movieResult)
+        {
+            coverage.Episodes = coverage.Episodes.OrderBy(x => x.Title).ToList();
+        }
+
+        // 找到剧集分类
+        var seriesResult = result.Where(x => x.Episodes.Any(y => !y.IsMovie)).ToList();
+        // 排序
+        seriesResult = seriesResult.OrderBy(x => x.Series).ToList();
+        foreach (var coverage in seriesResult)
+        {
+            coverage.Episodes = coverage.Episodes.OrderBy(x => x.Season).ThenBy(x => x.Episode).ToList();
+        }
+
+        // 合并结果
+        result = seriesResult.Concat(movieResult).ToList();
         return Ok(result);
     }
 
