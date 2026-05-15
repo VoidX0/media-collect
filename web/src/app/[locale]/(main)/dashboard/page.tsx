@@ -431,9 +431,8 @@ export default function Page() {
           <Carousel
             className="w-full px-4 xl:px-12"
             plugins={[plugin.current]}
-            // 悬浮时暂停轮播，移开后恢复
-            onMouseEnter={plugin.current.stop}
-            onMouseLeave={plugin.current.reset}
+            onMouseEnter={() => plugin.current.stop()}
+            onMouseLeave={() => plugin.current.play()}
           >
             <CarouselContent>
               {danmuHeatmapOptions.map((item, index) => (
