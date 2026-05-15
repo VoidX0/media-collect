@@ -6,26 +6,14 @@ import UniversalChart from '@/components/chart/universal-chart'
 import { formatDate } from '@/lib/date-time'
 import { openapi } from '@/lib/http'
 import { EChartsOption } from 'echarts'
-import {
-  BarChart,
-  HeatmapChart,
-  LineChart,
-  PieChart,
-  ScatterChart,
-} from 'echarts/charts'
+import { BarChart, HeatmapChart, LineChart, PieChart, ScatterChart } from 'echarts/charts'
 import { VisualMapComponent } from 'echarts/components'
 import * as echarts from 'echarts/core'
 import { Loader } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel'
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import { resolveColor } from '@/lib/echarts/dynamic-theme'
 import Autoplay from 'embla-carousel-autoplay'
 
@@ -368,8 +356,16 @@ export default function Page() {
               data: heatmapData,
               label: { show: false },
               itemStyle: {
-                borderColor: resolveColor('--foreground'),
+                borderColor: resolveColor('--border'),
                 borderWidth: 1,
+                borderRadius: 2,
+              },
+              emphasis: {
+                itemStyle: {
+                  borderColor: resolveColor('--border'),
+                  borderWidth: 2,
+                  shadowBlur: 5,
+                },
               },
             },
           ],
