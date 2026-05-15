@@ -89,14 +89,28 @@ export const schemas = {
       description: '集数',
     },
   },
-  CoverageSeason: {
-    name: {
+  CoverageEpisode: {
+    title: {
       type: 'string | undefined',
-      description: '季名称',
+      description: '名称',
     },
-    episodeCoverage: {
-      type: '{ [key: string]: boolean; } | undefined',
-      description: '集数覆盖率，键为集数，值为是否覆盖',
+    season: {
+      type: 'string | number | undefined',
+      description: '季数',
+      format: 'int32',
+    },
+    episode: {
+      type: 'string | number | undefined',
+      description: '集数',
+      format: 'int32',
+    },
+    isMovie: {
+      type: 'boolean | undefined',
+      description: '是否为电影',
+    },
+    haveDanmu: {
+      type: 'boolean | undefined',
+      description: '是否有弹幕',
     },
   },
   CustomConditionalType: {},
@@ -106,9 +120,9 @@ export const schemas = {
       type: 'string | undefined',
       description: '系列',
     },
-    seasons: {
-      type: '{ name?: string | undefined; episodeCoverage?: { [key: string]: boolean; } | undefined; }[] | undefined',
-      description: '季覆盖率列表',
+    episodes: {
+      type: '{ title?: string | undefined; season?: string | number | undefined; episode?: string | number | undefined; isMovie?: boolean | undefined; haveDanmu?: boolean | undefined; }[] | undefined',
+      description: '集覆盖率列表',
     },
   },
   DownloadTask: {
@@ -495,7 +509,7 @@ export const schemas = {
 export type AggregateException = components['schemas']['AggregateException']
 export type ChatMessage = components['schemas']['ChatMessage']
 export type CollectedMedia = components['schemas']['CollectedMedia']
-export type CoverageSeason = components['schemas']['CoverageSeason']
+export type CoverageEpisode = components['schemas']['CoverageEpisode']
 export type CustomConditionalType =
   components['schemas']['CustomConditionalType']
 export type CustomOrderByType = components['schemas']['CustomOrderByType']

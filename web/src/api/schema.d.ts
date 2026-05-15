@@ -2415,14 +2415,24 @@ export interface components {
             /** @description 集数 */
             episode?: string;
         };
-        /** @description 季覆盖率 */
-        CoverageSeason: {
-            /** @description 季名称 */
-            name?: string;
-            /** @description 集数覆盖率，键为集数，值为是否覆盖 */
-            episodeCoverage?: {
-                [key: string]: boolean;
-            };
+        /** @description 集覆盖率 */
+        CoverageEpisode: {
+            /** @description 名称 */
+            title?: string;
+            /**
+             * Format: int32
+             * @description 季数
+             */
+            season?: number | string;
+            /**
+             * Format: int32
+             * @description 集数
+             */
+            episode?: number | string;
+            /** @description 是否为电影 */
+            isMovie?: boolean;
+            /** @description 是否有弹幕 */
+            haveDanmu?: boolean;
         };
         /**
          * @description 条件类型
@@ -2461,8 +2471,8 @@ export interface components {
         DanmuCoverage: {
             /** @description 系列 */
             series?: string;
-            /** @description 季覆盖率列表 */
-            seasons?: components["schemas"]["CoverageSeason"][];
+            /** @description 集覆盖率列表 */
+            episodes?: components["schemas"]["CoverageEpisode"][];
         };
         /** @description 下载任务 */
         DownloadTask: {

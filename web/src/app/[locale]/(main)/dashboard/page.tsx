@@ -17,7 +17,7 @@ import { VisualMapComponent } from 'echarts/components'
 import * as echarts from 'echarts/core'
 import { Loader } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   Carousel,
@@ -27,6 +27,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel'
 import { resolveColor } from '@/lib/echarts/dynamic-theme'
+import Autoplay from 'embla-carousel-autoplay'
 
 echarts.use([
   LineChart,
@@ -61,6 +62,10 @@ export default function Page() {
   const [danmuCoverage, setDanmuCoverage] = useState<
     DanmuCoverage[] | undefined
   >()
+
+  // 初始化 Autoplay 插件，配置延迟
+  const plugin = useRef(Autoplay({ delay: 4000, stopOnInteraction: true }))
+
   // 加载数据
   useEffect(() => {
     const fetch = async () => {
@@ -77,7 +82,7 @@ export default function Page() {
     fetch().then()
   }, [])
 
-  // 1. 处理趋势图 (已有的堆叠面积图)
+  // 1. 处理趋势图
   const optionsByDay = useMemo(() => {
     if (!medias?.length) return {}
     const dateSeriesMap: Record<string, Record<string, number>> = {}
@@ -262,98 +267,117 @@ export default function Page() {
   const danmuHeatmapOptions = useMemo(() => {
     if (!danmuCoverage?.length) return []
 
-    return danmuCoverage.map((coverage) => {
-      const { series, seasons } = coverage
-      const allEpisodesSet = new Set<string>()
-      let totalEpisodes = 0
-      let coveredEpisodes = 0
+    return danmuCoverage
+      .map((coverage) => {
+        const { series, episodes } = coverage as DanmuCoverage
+        if (!episodes || episodes.length === 0) return null
 
-      // 统计数据并收集所有集数（作为X轴）
-      seasons?.forEach((season) => {
-        Object.entries(season.episodeCoverage || {}).forEach(
-          ([ep, hasDanmu]) => {
-            allEpisodesSet.add(ep)
-            totalEpisodes++
-            if (hasDanmu) coveredEpisodes++
-          },
-        )
-      })
+        let xAxisData: string[] = []
+        let yAxisData: string[] = []
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const heatmapData: any[] = []
 
-      // 对集数进行排序，优先按数字大小排，字母靠后
-      const xAxisData = Array.from(allEpisodesSet).sort((a, b) => {
-        const numA = parseInt(a)
-        const numB = parseInt(b)
-        if (!isNaN(numA) && !isNaN(numB)) return numA - numB
-        return a.localeCompare(b)
-      })
+        const totalEpisodes = episodes.length
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const coveredEpisodes = episodes.filter((e: any) => e.haveDanmu).length
+        // 通过第一集判断是否属于电影
+        const isMovieType = episodes[0]?.isMovie
 
-      // Y轴：季的名称
-      const yAxisData = seasons?.map((s) => s.name)
-
-      // 组装热力图数据: [xIndex, yIndex, value (1=true, 0=false)]
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const heatmapData: any[] = []
-      seasons?.forEach((season, yIndex) => {
-        Object.entries(season.episodeCoverage || {}).forEach(
-          ([ep, hasDanmu]) => {
-            const xIndex = xAxisData.indexOf(ep)
-            heatmapData.push([xIndex, yIndex, hasDanmu ? 1 : 0])
-          },
-        )
-      })
-
-      // 计算覆盖率
-      const percentage =
-        totalEpisodes === 0
-          ? 0
-          : Math.round((coveredEpisodes / totalEpisodes) * 100)
-      const title = `${series} (${percentage}%)`
-
-      const option: EChartsOption = {
-        ...COMMON_CHART_CONFIG,
-        legend: undefined,
-        tooltip: {
-          position: 'top',
+        if (isMovieType) {
+          // --- 电影模式 ---
+          yAxisData = [''] // Y轴留空，单行展示
+          // X轴使用 title
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          formatter: (params: any) => {
-            const seasonName = yAxisData![params.value[1]]
-            const episodeName = xAxisData![params.value[0]]
-            const isCovered = params.value[2] === 1
-            return `${seasonName} <br/> ${episodeName}: <b>${isCovered ? t('haveCoverage') : t('noCoverage')}</b>`
-          },
-        },
-        xAxis: {
-          type: 'category',
-          data: xAxisData,
-          splitArea: { show: true },
-        },
-        yAxis: {
-          type: 'category',
-          data: yAxisData,
-          inverse: true,
-        } as unknown as EChartsOption['yAxis'],
-        visualMap: {
-          min: 0,
-          max: 1,
-          calculable: false,
-          show: false, // 隐藏图例
-        },
-        series: [
-          {
-            name: t('danmuCoverage'),
-            type: 'heatmap',
-            data: heatmapData,
-            label: { show: false },
-            itemStyle: {
-              borderColor: resolveColor('--foreground'),
-              borderWidth: 1,
+          xAxisData = episodes.map((e: any) => e.title || 'Unknown')
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          episodes.forEach((e: any, xIndex: number) => {
+            // 数据格式：[x坐标, y坐标, 数值(0/1), 额外数据(如title)]
+            heatmapData.push([xIndex, 0, e.haveDanmu ? 1 : 0, e.title])
+          })
+        } else {
+          // --- 剧集模式 ---
+          // 提取所有唯一季数并排序作为Y轴
+          const seasons = Array.from(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            new Set(episodes.map((e: any) => e.season)),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ).sort((a: any, b: any) => a - b)
+
+          // 提取所有唯一集数并排序作为X轴
+          const eps = Array.from(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            new Set(episodes.map((e: any) => e.episode)),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ).sort((a: any, b: any) => a - b)
+
+          yAxisData = seasons.map((s) => `Season ${s}`)
+          xAxisData = eps.map((e) => `${e}`)
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          episodes.forEach((e: any) => {
+            const xIndex = eps.indexOf(e.episode)
+            const yIndex = seasons.indexOf(e.season)
+            // 将 title 作为第4个参数携带进去，供 Tooltip 使用
+            heatmapData.push([xIndex, yIndex, e.haveDanmu ? 1 : 0, e.title])
+          })
+        }
+
+        // 计算覆盖率百分比
+        const percentage =
+          totalEpisodes === 0
+            ? 0
+            : Math.round((coveredEpisodes / totalEpisodes) * 100)
+        const title = `${series} (${percentage}%)`
+
+        const option: EChartsOption = {
+          ...COMMON_CHART_CONFIG,
+          legend: undefined,
+          tooltip: {
+            position: 'top',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            formatter: (params: any) => {
+              // params.data 即为我们 push 进去的数组 [x, y, value, title]
+              const isCovered = params.data[2] === 1
+              const epTitle = params.data[3] || ''
+              // 直接展示后端返回的完整 title，体验更好
+              return `${epTitle} <br/> <b>${isCovered ? t('haveCoverage') : t('noCoverage')}</b>`
             },
           },
-        ],
-      }
+          xAxis: {
+            type: 'category',
+            data: xAxisData,
+            splitArea: { show: true },
+          },
+          yAxis: {
+            type: 'category',
+            data: yAxisData,
+            // 剧集类型翻转Y轴让第一季在上方，单行电影不需要翻转
+            inverse: !isMovieType,
+          } as unknown as EChartsOption['yAxis'],
+          visualMap: {
+            min: 0,
+            max: 1,
+            calculable: false,
+            show: false, // 隐藏图例
+          },
+          series: [
+            {
+              name: t('danmuCoverage'),
+              type: 'heatmap',
+              data: heatmapData,
+              label: { show: false },
+              itemStyle: {
+                borderColor: resolveColor('--foreground'),
+                borderWidth: 1,
+              },
+            },
+          ],
+        }
 
-      return { title, option }
-    })
+        return { title, option }
+      })
+      .filter(Boolean) as { title: string; option: EChartsOption }[] // 过滤掉空数据
   }, [danmuCoverage, t])
 
   if (loading) {
@@ -401,10 +425,16 @@ export default function Page() {
         />
       </div>
 
-      {/* 弹幕覆盖率热力图 */}
+      {/* 弹幕覆盖率热力图 (自动轮播) */}
       {danmuHeatmapOptions && danmuHeatmapOptions.length > 0 && (
         <div className="w-full">
-          <Carousel className="w-full px-4 xl:px-12">
+          <Carousel
+            className="w-full px-4 xl:px-12"
+            plugins={[plugin.current]}
+            // 悬浮时暂停轮播，移开后恢复
+            onMouseEnter={plugin.current.stop}
+            onMouseLeave={plugin.current.reset}
+          >
             <CarouselContent>
               {danmuHeatmapOptions.map((item, index) => (
                 <CarouselItem key={index}>
