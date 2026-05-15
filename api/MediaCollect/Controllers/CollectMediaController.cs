@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Text.RegularExpressions;
 using MediaCollect.Controllers.Base;
 using MediaCollect.Core.Models.Common;
 using MediaCollect.Core.Models.Db;
@@ -245,48 +246,60 @@ public class CollectMediaController : OrmController<CollectedMedia>
             // 解析目录结构
             var dirParts = group.Key?.Split(Path.DirectorySeparatorChar) ?? [];
             if (dirParts.Length < 2) continue;
-            // 剧集正常解析 series/season
-            // 电影series固定，season为电影名
-            var season = dirParts.Last();
-            var series = dirParts[^2];
+            var series = dirParts[^2]; // 倒数第二级目录为剧集名称
             // 计算每个视频文件的弹幕覆盖率
-            var coverage = result.FirstOrDefault(x => x.Series == series) ??
-                           new DanmuCoverage { Series = series };
-            var coverageSeason = coverage.Seasons.FirstOrDefault(x => x.Name == season) ??
-                                 new CoverageSeason() { Name = season };
+            var coverage = result.FirstOrDefault(x => x.Series == series) ?? new DanmuCoverage { Series = series };
             foreach (var video in group)
             {
                 // 检查是否有对应的xml,如果有则认为有弹幕
                 var nameWithoutExtension = Path.GetFileNameWithoutExtension(video);
                 var danmuFile = Path.Combine(Path.GetDirectoryName(video) ?? "", nameWithoutExtension + ".xml");
+                // 是否匹配 - S02E01 - 这样的命名方式，如果匹配，代表能解析出季数和集数，否则认为是电影。注意后面的集数可能是两位也可能是三位
+                var isMovie = true;
+                var seasonNumber = 0;
+                var episodeNumber = 0;
+                var match = Regex.Match(nameWithoutExtension, @"- S(\d{2})E(\d{2,3}) -", RegexOptions.IgnoreCase);
+                if (match.Success)
+                {
+                    isMovie = false;
+                    seasonNumber = int.TryParse(match.Groups[1].Value, out var sNumber)
+                        ? sNumber
+                        : 0;
+                    episodeNumber = int.TryParse(match.Groups[2].Value, out var eNumber) ? eNumber : 0;
+                }
+
                 // 添加覆盖率信息
-                coverageSeason.EpisodeCoverage.Add(nameWithoutExtension, System.IO.File.Exists(danmuFile));
+                coverage.Episodes.Add(new CoverageEpisode
+                {
+                    Title = nameWithoutExtension,
+                    Season = seasonNumber,
+                    Episode = episodeNumber,
+                    IsMovie = isMovie,
+                    HaveDanmu = System.IO.File.Exists(danmuFile)
+                });
             }
 
-            // 添加季信息
-            if (coverage.Seasons.All(x => x.Name != season))
-                coverage.Seasons.Add(coverageSeason);
             // 添加剧集信息
             if (result.All(x => x.Series != series))
                 result.Add(coverage);
         }
 
-        // 找到剧集分类
-        var seriesResult = result.Where(x => !_subtitleOptions.MovieDirectory.Contains(x.Series)).ToList();
-        // 排序
-        seriesResult = seriesResult.OrderBy(x => x.Series).ToList();
-        foreach (var coverage in seriesResult)
-        {
-            coverage.Seasons = coverage.Seasons.OrderBy(x => x.Name).ToList();
-        }
-
         // 找到到电影分类
-        var movieResult = result.Where(x => _subtitleOptions.MovieDirectory.Contains(x.Series)).ToList();
+        var movieResult = result.Where(x => x.Episodes.All(y => y.IsMovie)).ToList();
         // 排序
         movieResult = movieResult.OrderBy(x => x.Series).ToList();
         foreach (var coverage in movieResult)
         {
-            coverage.Seasons = coverage.Seasons.OrderBy(x => x.Name).ToList();
+            coverage.Episodes = coverage.Episodes.OrderBy(x => x.Title).ToList();
+        }
+
+        // 找到剧集分类
+        var seriesResult = result.Where(x => x.Episodes.Any(y => !y.IsMovie)).ToList();
+        // 排序
+        seriesResult = seriesResult.OrderBy(x => x.Series).ToList();
+        foreach (var coverage in seriesResult)
+        {
+            coverage.Episodes = coverage.Episodes.OrderBy(x => x.Season).ThenBy(x => x.Episode).ToList();
         }
 
         // 合并结果

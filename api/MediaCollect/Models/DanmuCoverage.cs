@@ -11,23 +11,38 @@ public class DanmuCoverage
     public string Series { get; set; } = string.Empty;
 
     /// <summary>
-    /// 季覆盖率列表
+    /// 集覆盖率列表
     /// </summary>
-    public List<CoverageSeason> Seasons { get; set; } = [];
+    public List<CoverageEpisode> Episodes { get; set; } = [];
 }
 
 /// <summary>
-/// 季覆盖率
+/// 集覆盖率
 /// </summary>
-public class CoverageSeason
+public class CoverageEpisode
 {
     /// <summary>
-    /// 季名称
+    /// 名称
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    /// 集数覆盖率，键为集数，值为是否覆盖
+    /// 季数
     /// </summary>
-    public Dictionary<string, bool> EpisodeCoverage { get; set; } = new();
+    public int Season { get; set; }
+
+    /// <summary>
+    /// 集数
+    /// </summary>
+    public int Episode { get; set; }
+
+    /// <summary>
+    /// 是否为电影
+    /// </summary>
+    public bool IsMovie { get; set; }
+
+    /// <summary>
+    /// 是否有弹幕
+    /// </summary>
+    public bool HaveDanmu { get; set; }
 }
