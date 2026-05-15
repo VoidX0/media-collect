@@ -1806,6 +1806,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/CollectMedia/DanmuCoverage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 获取弹幕覆盖率信息 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["DanmuCoverage"][];
+                        "application/json": components["schemas"]["DanmuCoverage"][];
+                        "text/json": components["schemas"]["DanmuCoverage"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MessageCode"];
+                        "application/json": components["schemas"]["MessageCode"];
+                        "text/json": components["schemas"]["MessageCode"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/CollectMedia/RemoveCompleteTask": {
         parameters: {
             query?: never;
@@ -2366,6 +2415,15 @@ export interface components {
             /** @description 集数 */
             episode?: string;
         };
+        /** @description 季覆盖率 */
+        CoverageSeason: {
+            /** @description 季名称 */
+            name?: string;
+            /** @description 集数覆盖率，键为集数，值为是否覆盖 */
+            episodeCoverage?: {
+                [key: string]: boolean;
+            };
+        };
         /**
          * @description 条件类型
          *
@@ -2399,6 +2457,13 @@ export interface components {
          *     | 1 | Desc |
          */
         CustomOrderByType: number;
+        /** @description 弹幕覆盖率 */
+        DanmuCoverage: {
+            /** @description 系列 */
+            series?: string;
+            /** @description 季覆盖率列表 */
+            seasons?: components["schemas"]["CoverageSeason"][];
+        };
         /** @description 下载任务 */
         DownloadTask: {
             /** @description 媒体信息 */

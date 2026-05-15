@@ -1,9 +1,10 @@
 'use client'
 
-import { CollectedMedia } from '@/api/generatedSchemas'
+import { CollectedMedia, DanmuCoverage } from '@/api/generatedSchemas'
 import { getMedias } from '@/app/[locale]/(main)/collect-media/media'
 import UniversalChart from '@/components/chart/universal-chart'
 import { formatDate } from '@/lib/date-time'
+import { openapi } from '@/lib/http'
 import { EChartsOption } from 'echarts'
 import { BarChart, LineChart, PieChart, ScatterChart } from 'echarts/charts'
 import * as echarts from 'echarts/core'
@@ -31,14 +32,25 @@ const COMMON_CHART_CONFIG = {
 export default function Page() {
   const t = useTranslations('DashboardPage')
   const [loading, setLoading] = useState(false)
-  // 加载已处理完成的媒体
+  // 已处理完成的媒体
   const [medias, setMedias] = useState<CollectedMedia[] | undefined>([])
+  // 弹幕覆盖率信息
+  const [danmuCoverage, setDanmuCoverage] = useState<
+    DanmuCoverage[] | undefined
+  >()
+  // 加载数据
   useEffect(() => {
     const fetch = async () => {
       setLoading(true)
-      setMedias(
-        (await getMedias()).filter((m) => Number(m.episode?.length) > 0),
-      )
+      const [mediaRes, coverageRes] = await Promise.all([
+        getMedias(),
+        openapi.GET('/CollectMedia/DanmuCoverage'),
+      ])
+
+      setMedias(mediaRes.filter((m) => Number(m.episode?.length) > 0))
+      setDanmuCoverage(coverageRes.data)
+      console.log('Fetched medias:', mediaRes)
+      console.log('Fetched danmu coverage:', coverageRes.data)
       setLoading(false)
     }
     fetch().then()
