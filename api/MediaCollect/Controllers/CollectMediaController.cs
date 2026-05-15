@@ -22,6 +22,7 @@ public class CollectMediaController : OrmController<CollectedMedia>
     private readonly WebDavService _webDavService;
     private readonly SonarrService _sonarrService;
     private readonly WebDavOptions _webDavOptions;
+    private readonly SubtitleOptions _subtitleOptions;
 
     /// <summary>
     /// 构造函数
@@ -29,12 +30,14 @@ public class CollectMediaController : OrmController<CollectedMedia>
     /// <param name="webDavService"></param>
     /// <param name="sonarrService"></param>
     /// <param name="webDavOptions"></param>
+    /// <param name="subtitleOptions"></param>
     public CollectMediaController(WebDavService webDavService, SonarrService sonarrService,
-        IOptions<WebDavOptions> webDavOptions)
+        IOptions<WebDavOptions> webDavOptions, IOptions<SubtitleOptions> subtitleOptions)
     {
         _webDavService = webDavService;
         _sonarrService = sonarrService;
         _webDavOptions = webDavOptions.Value;
+        _subtitleOptions = subtitleOptions.Value;
     }
 
     /// <summary>
@@ -215,6 +218,79 @@ public class CollectMediaController : OrmController<CollectedMedia>
         var result = tasks.Select(x => x.Result)
             .Where(x => x is not null)
             .OrderBy(x => x?.Series.Title).ToList();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// 获取弹幕覆盖率信息
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<ActionResult<List<DanmuCoverage>>> DanmuCoverage()
+    {
+        var result = new List<DanmuCoverage>();
+        // 获取匹配信息
+        var path = _subtitleOptions.SeriesDirectory.Concat(_subtitleOptions.MovieDirectory)
+            .Select(x => Path.Combine(App.MediaPath, x))
+            .Where(Directory.Exists)
+            .ToList();
+        // 获取所有视频文件，按目录分组
+        var videosByDir = path
+            .SelectMany(x => Directory.GetFiles(x, "*.*", SearchOption.AllDirectories)
+                .Where(file =>
+                    App.VideoExtension.Contains(Path.GetExtension(file), StringComparer.CurrentCultureIgnoreCase)))
+            .GroupBy(Path.GetDirectoryName);
+        foreach (var group in videosByDir)
+        {
+            // 解析目录结构
+            var dirParts = group.Key?.Split(Path.DirectorySeparatorChar) ?? [];
+            if (dirParts.Length < 2) continue;
+            // 剧集正常解析 series/season
+            // 电影series固定，season为电影名
+            var season = dirParts.Last();
+            var series = dirParts[^2];
+            // 计算每个视频文件的弹幕覆盖率
+            var coverage = result.FirstOrDefault(x => x.Series == series) ??
+                           new DanmuCoverage { Series = series };
+            var coverageSeason = coverage.Seasons.FirstOrDefault(x => x.Name == season) ??
+                                 new CoverageSeason() { Name = season };
+            foreach (var video in group)
+            {
+                // 检查是否有对应的xml,如果有则认为有弹幕
+                var nameWithoutExtension = Path.GetFileNameWithoutExtension(video);
+                var danmuFile = Path.Combine(Path.GetDirectoryName(video) ?? "", nameWithoutExtension + ".xml");
+                // 添加覆盖率信息
+                coverageSeason.EpisodeCoverage.Add(nameWithoutExtension, System.IO.File.Exists(danmuFile));
+            }
+
+            // 添加季信息
+            if (coverage.Seasons.All(x => x.Name != season))
+                coverage.Seasons.Add(coverageSeason);
+            // 添加剧集信息
+            if (result.All(x => x.Series != series))
+                result.Add(coverage);
+        }
+
+        // 找到剧集分类
+        var seriesResult = result.Where(x => !_subtitleOptions.MovieDirectory.Contains(x.Series)).ToList();
+        // 排序
+        seriesResult = seriesResult.OrderBy(x => x.Series).ToList();
+        foreach (var coverage in seriesResult)
+        {
+            coverage.Seasons = coverage.Seasons.OrderBy(x => x.Name).ToList();
+        }
+
+        // 找到到电影分类
+        var movieResult = result.Where(x => _subtitleOptions.MovieDirectory.Contains(x.Series)).ToList();
+        // 排序
+        movieResult = movieResult.OrderBy(x => x.Series).ToList();
+        foreach (var coverage in movieResult)
+        {
+            coverage.Seasons = coverage.Seasons.OrderBy(x => x.Name).ToList();
+        }
+
+        // 合并结果
+        result = seriesResult.Concat(movieResult).ToList();
         return Ok(result);
     }
 
