@@ -427,6 +427,7 @@ export default function Page() {
           <Carousel
             className="w-full px-4 xl:px-12"
             plugins={[plugin.current]}
+            opts={{ loop: true }}
             onMouseEnter={() => plugin.current.stop()}
             onMouseLeave={() => plugin.current.play()}
           >
