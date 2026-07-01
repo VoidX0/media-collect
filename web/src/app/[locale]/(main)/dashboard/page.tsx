@@ -128,6 +128,7 @@ export default function Page() {
         stack: 'Total',
         areaStyle: {},
         smooth: true,
+        symbol: 'none',
         emphasis: { focus: 'series' },
         encode: { x: 'date', y: name },
       })),
