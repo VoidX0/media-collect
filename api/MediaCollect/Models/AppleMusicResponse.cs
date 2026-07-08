@@ -74,7 +74,7 @@ public class AppleMusicAlbum
     public string WrapperType { get; set; } = string.Empty;
 
     /// <summary>
-    /// 集合类型 (例如: "Album" 或 "Single")
+    /// 集合类型
     /// </summary>
     public string CollectionType { get; set; } = string.Empty;
 
@@ -161,7 +161,7 @@ public class AppleMusicTrack
     public string WrapperType { get; set; } = string.Empty;
 
     /// <summary>
-    /// 资源类型 ("song")
+    /// 资源类型
     /// </summary>
     public string Kind { get; set; } = string.Empty;
 
